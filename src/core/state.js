@@ -136,14 +136,29 @@ export function setMode(mode) {
 export function loadSettings() {
   try {
     const saved = localStorage.getItem('arkeen_settings');
-    if (saved) Object.assign(state.settings, JSON.parse(saved));
-  } catch (e) {}
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // Validate difficulty exists
+      if (parsed.difficulty && !DIFFICULTY[parsed.difficulty]) {
+        parsed.difficulty = 'normal'; // fallback
+      }
+      // Validate theme exists
+      if (parsed.theme && !THEMES[parsed.theme]) {
+        parsed.theme = 'void'; // fallback
+      }
+      Object.assign(state.settings, parsed);
+    }
+  } catch (e) {
+    console.warn('Failed to load settings, using defaults:', e);
+  }
 }
 
 export function saveSettings() {
   try {
     localStorage.setItem('arkeen_settings', JSON.stringify(state.settings));
-  } catch (e) {}
+  } catch (e) {
+    console.warn('Failed to save settings:', e);
+  }
 }
 
 export function loadStats() {
@@ -156,7 +171,9 @@ export function loadStats() {
     if (ach) state.achievements = JSON.parse(ach);
     const best = localStorage.getItem('arkeen_best');
     if (best) state.best = parseInt(best, 10);
-  } catch (e) {}
+  } catch (e) {
+    console.warn('Failed to load stats:', e);
+  }
 }
 
 export function saveStats() {
@@ -165,7 +182,9 @@ export function saveStats() {
     localStorage.setItem('arkeen_leaderboard', JSON.stringify(state.leaderboard));
     localStorage.setItem('arkeen_achievements', JSON.stringify(state.achievements));
     localStorage.setItem('arkeen_best', String(state.best));
-  } catch (e) {}
+  } catch (e) {
+    console.warn('Failed to save stats:', e);
+  }
 }
 
 export function resetAllData() {
@@ -187,5 +206,11 @@ export function initState() {
   loadSettings();
   loadStats();
   state.isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  // SAFE fallback: if difficulty doesn't exist, default to normal
+  const diff = state.settings.difficulty;
+  if (!DIFFICULTY[diff]) {
+    console.warn(`Invalid difficulty "${diff}", falling back to normal`);
+    state.settings.difficulty = 'normal';
+  }
   state.step = DIFFICULTY[state.settings.difficulty].step;
 }
