@@ -1,2 +1,2 @@
 /*
-  ! Content-Security-Policy
+  X-Frame-Options: DENY

@@ -184,8 +184,9 @@ function renderGameOver() {
   document.getElementById('goLevel').textContent = state.level;
   document.getElementById('goBest').textContent = state.best;
   const nameEntry = document.getElementById('nameEntry');
-  const isNewHigh = state.score > 0 && (state.leaderboard.length === 0 || state.score >= state.leaderboard[0].score);
-  if (isNewHigh) {
+  // Check if current score is in top 5 of leaderboard
+  const isTop5 = state.score > 0 && (state.leaderboard.length <= 5 || state.score >= state.leaderboard[4].score);
+  if (isTop5) {
     nameEntry.classList.remove('hidden');
     document.getElementById('playerName').value = '';
   } else {
@@ -197,11 +198,11 @@ function renderMenuLeaderboard() {
   const list = document.getElementById('menuLeaderboardList');
   if (!list) return;
   if (state.leaderboard.length === 0) {
-    list.innerHTML = '<p class="empty-msg" style="font-size:0.8rem;padding:10px 0;">No champions yet...</p>';
+    list.innerHTML = '<p class="empty-msg">No champions yet...</p>';
     return;
   }
   list.innerHTML = state.leaderboard.slice(0, 5).map((entry, i) => {
-    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉';
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
     return `<div class="lb-entry"><span class="lb-rank">${medal}</span><span class="lb-name">${entry.name || 'Unknown'}</span><span class="lb-score">${entry.score}</span></div>`;
   }).join('');
 }
@@ -210,7 +211,7 @@ function renderAchievements() {
   const grid = document.getElementById('achievementsGrid');
   grid.innerHTML = Object.values(ACHIEVEMENTS).map(ach => {
     const unlocked = state.achievements[ach.id];
-    return `<div class="ach-card ${unlocked ? 'unlocked' : 'locked'}"><span class="ach-icon">${ach.icon}</span><div class="ach-info"><span class="ach-title">${ach.title}</span><span class="ach-desc">${ach.desc}</span></div><span class="ach-status">${unlocked ? '✓' : '🔒'}</span></div>`;
+    return `<div class="ach-card ${unlocked ? 'unlocked' : 'locked'}"><span class="ach-icon">${ach.icon}</span><div><span class="ach-title">${ach.title}</span><span class="ach-desc">${ach.desc}</span></div><span class="ach-status">${unlocked ? '✓' : '🔒'}</span></div>`;
   }).join('');
 }
 
@@ -231,6 +232,7 @@ function restartGame() {
   state.paused = false;
   state.startTime = Date.now();
   state.step = DIFFICULTY[state.settings.difficulty].step;
+  state.moveAccumulator = 0;
 
   const mid = Math.floor(state.gridSize / 2);
   state.snake = [

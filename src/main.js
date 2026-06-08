@@ -21,10 +21,14 @@ function init() {
 
 function update() {
   if (state.mode === 'playing') {
-    applyNextDirection();
-    moveSnake();
-    checkFood();
-    checkCollision();
+    state.moveAccumulator += 16;
+    while (state.moveAccumulator >= state.step) {
+      state.moveAccumulator -= state.step;
+      applyNextDirection();
+      moveSnake();
+      checkFood();
+      checkCollision();
+    }
   }
   if (state.mode !== lastScreenMode) {
     lastScreenMode = state.mode;

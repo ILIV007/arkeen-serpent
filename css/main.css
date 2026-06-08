@@ -85,17 +85,16 @@ html, body {
 .menu-layout {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   gap: 24px;
   width: 100%;
-  max-width: 900px;
   padding: 20px;
   height: 100%;
-  max-height: 700px;
+  position: relative;
 }
 
-/* Left side: Logo + Nav */
+/* Left side: Logo + Nav (centered) */
 .menu-main {
   display: flex;
   flex-direction: column;
@@ -105,6 +104,8 @@ html, body {
   min-width: 0;
   justify-content: center;
   height: 100%;
+  max-width: 360px;
+  margin: 0 auto;
 }
 
 .logo-area {
@@ -150,14 +151,15 @@ html, body {
   text-transform: uppercase;
 }
 
-/* Right side: Leaderboard Sidebar */
+/* Right side: Leaderboard Sidebar — FIXED top-right */
 .menu-sidebar {
+  position: fixed;
+  top: 20px;
+  right: 20px;
   width: 220px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 100%;
+  z-index: 15;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
 }
 
 .sidebar-card {
@@ -957,7 +959,6 @@ input:checked + .toggle::after {
 /* Tablet: shrink sidebar */
 @media (max-width: 768px) {
   .menu-sidebar { width: 180px; }
-  .menu-layout { gap: 16px; }
 }
 
 /* Mobile: stack vertically, sidebar goes BELOW nav */
@@ -975,9 +976,13 @@ input:checked + .toggle::after {
     gap: 10px;
   }
   .menu-sidebar {
+    position: relative;
+    top: auto;
+    right: auto;
     width: 100%;
     max-width: 320px;
     order: 3;
+    max-height: none;
   }
   .sidebar-card {
     padding: 10px 12px;
