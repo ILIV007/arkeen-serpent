@@ -1,8 +1,9 @@
-const CACHE_NAME = 'arkeen-v1';
+const CACHE_NAME = 'arkeen-v1.1';
 const urlsToCache = [
   '/',
   '/index.html',
   '/css/style.css',
+  '/js/config.js',
   '/js/storage.js',
   '/js/audio.js',
   '/js/input.js',

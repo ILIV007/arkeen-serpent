@@ -2,29 +2,36 @@
  * RENDERER — Arkeen Serpent
  */
 const Renderer = (function(){
-  const COLS = 40, ROWS = 40, PX = 14;
+  const COLS = CONFIG.COLS, ROWS = CONFIG.ROWS, PX = CONFIG.PX;
   const cv = document.getElementById('cv');
   const ctx = cv.getContext('2d');
   cv.width = COLS * PX; cv.height = ROWS * PX;
   ctx.imageSmoothingEnabled = false;
 
-  const THEMES = {
-    royal:   {bg:'#0a0a1a', tile1:'#12122a', tile2:'#1a1a3a', border:'#2a2030', accent:'#4a3a60', gold:'#c9a840', snakeH:160, snakeS:60, snakeL:45},
-    dungeon: {bg:'#0a000a', tile1:'#140014', tile2:'#1a001a', border:'#3a003a', accent:'#6a2060', gold:'#c080ff', snakeH:280, snakeS:50, snakeL:40},
-    forest:  {bg:'#000a00', tile1:'#001400', tile2:'#0a1a0a', border:'#1a4a00', accent:'#206020', gold:'#80d040', snakeH:100, snakeS:55, snakeL:40},
-    volcano: {bg:'#1a0500', tile1:'#2a0800', tile2:'#3a0a00', border:'#6a2000', accent:'#a04020', gold:'#ff8040', snakeH:15,  snakeS:70, snakeL:45},
-    icy:     {bg:'#000a14', tile1:'#00101a', tile2:'#001a2a', border:'#0a3a5a', accent:'#206080', gold:'#80e0ff', snakeH:190, snakeS:60, snakeL:50},
-    mystic:  {bg:'#0a0014', tile1:'#14001a', tile2:'#1a002a', border:'#3a0060', accent:'#602080', gold:'#c080ff', snakeH:270, snakeS:55, snakeL:45}
-  };
-
-  let currentTheme = 'royal';
+  let currentTheme = 'space';
   let particles = [];
   let floatingTexts = [];
   let shake = {x:0, y:0, intensity:0};
   let time = 0;
 
-  function setTheme(t){ currentTheme = THEMES[t] ? t : 'royal'; }
-  function getTheme(){ return THEMES[currentTheme]; }
+  // Stars background cache
+  let stars = [];
+  function initStars(){
+    stars = [];
+    for(let i=0;i<80;i++){
+      stars.push({
+        x: Math.random()*(COLS*PX),
+        y: Math.random()*(ROWS*PX),
+        size: 0.5 + Math.random()*1.5,
+        twinkle: Math.random()*Math.PI*2,
+        speed: 0.2 + Math.random()*0.5
+      });
+    }
+  }
+  initStars();
+
+  function setTheme(t){ currentTheme = CONFIG.themes[t] ? t : 'space'; }
+  function getTheme(){ return CONFIG.themes[currentTheme]; }
 
   class Particle {
     constructor(x, y, color, speed, life, size){
@@ -33,7 +40,7 @@ const Renderer = (function(){
       this.life = life; this.maxLife = life; this.size = size;
     }
     update(){
-      this.x += this.vx; this.y += this.vy; this.vy += 0.1;
+      this.x += this.vx; this.y += this.vy; this.vy += 0.05;
       this.life--; return this.life > 0;
     }
     draw(ctx){
@@ -81,47 +88,52 @@ const Renderer = (function(){
     } else { shake.x = 0; shake.y = 0; }
   }
 
+  // ===== BACKGROUND =====
+  function drawBackground(){
+    const p = getTheme();
+    ctx.fillStyle = p.bg; ctx.fillRect(0, 0, cv.width, cv.height);
+
+    // Stars
+    stars.forEach(s => {
+      const tw = Math.sin(time*2 + s.twinkle)*0.5 + 0.5;
+      ctx.fillStyle = `rgba(200,210,255,${0.3 + tw*0.7})`;
+      ctx.fillRect(s.x + shake.x, s.y + shake.y, s.size, s.size);
+    });
+
+    // Nebula dust
+    ctx.fillStyle = p.gold + '08';
+    for(let i=0;i<15;i++){
+      const dx = ((time*3 + i*137) % (COLS*PX));
+      const dy = ((time*1.5 + i*89) % (ROWS*PX));
+      ctx.fillRect(dx, dy, 2, 2);
+    }
+  }
+
+  // ===== TILES =====
   function drawTile(c, r, type){
     const p = getTheme();
     const x = c*PX + shake.x, y = r*PX + shake.y;
     if(type === 'border'){
       ctx.fillStyle = p.border; ctx.fillRect(x, y, PX, PX);
-      ctx.fillStyle = p.gold;
-      ctx.fillRect(x, y, 2, 2); ctx.fillRect(x+PX-2, y, 2, 2);
-      ctx.fillRect(x, y+PX-2, 2, 2); ctx.fillRect(x+PX-2, y+PX-2, 2, 2);
+      // Energy nodes on border
       if((c+r)%4 === 0){
-        ctx.fillStyle = 'rgba(255,120,40,0.15)';
-        ctx.fillRect(x+2, y+2, PX-4, PX-4);
+        ctx.fillStyle = p.gold;
+        ctx.fillRect(x+PX/2-1, y+PX/2-1, 2, 2);
       }
       return;
     }
     ctx.fillStyle = p.tile1; ctx.fillRect(x, y, PX, PX);
     if((c+r)%2 === 0){ ctx.fillStyle = p.tile2; ctx.fillRect(x+1, y+1, PX-2, PX-2); }
     if(type === 'patternA'){
-      ctx.fillStyle = p.gold + '33';
+      ctx.fillStyle = p.gold + '22';
       ctx.fillRect(x+PX/2-1, y+2, 2, PX-4);
       ctx.fillRect(x+2, y+PX/2-1, PX-4, 2);
     } else if(type === 'patternB'){
-      ctx.fillStyle = p.accent + '44';
+      ctx.fillStyle = p.accent + '33';
       ctx.fillRect(x+PX/2-1, y+1, 2, 2);
       ctx.fillRect(x+1, y+PX/2-1, 2, 2);
       ctx.fillRect(x+PX-3, y+PX/2-1, 2, 2);
       ctx.fillRect(x+PX/2-1, y+PX-3, 2, 2);
-    }
-    if((c*3+r*7)%23 === 0){
-      ctx.fillStyle = 'rgba(40,80,40,0.2)';
-      ctx.fillRect(x+2, y+PX-3, 3, 2);
-    }
-  }
-
-  function drawBackground(){
-    const p = getTheme();
-    ctx.fillStyle = p.bg; ctx.fillRect(0, 0, cv.width, cv.height);
-    ctx.fillStyle = p.gold + '11';
-    for(let i=0;i<20;i++){
-      const dx = ((time*10 + i*137) % (COLS*PX));
-      const dy = ((time*5 + i*89) % (ROWS*PX));
-      ctx.fillRect(dx, dy, 1, 1);
     }
   }
 
@@ -129,6 +141,57 @@ const Renderer = (function(){
     for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) drawTile(c, r, tiles[r][c]);
   }
 
+  // ===== PITS =====
+  function drawPits(pits){
+    if(!pits) return;
+    pits.forEach(pit => {
+      const x = pit.x*PX + shake.x, y = pit.y*PX + shake.y;
+      if(pit.state === 'warning'){
+        // Warning: pulsing red ring
+        const pulse = Math.sin(time*8)*0.3 + 0.5;
+        ctx.strokeStyle = `rgba(255,60,60,${pulse})`;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x+1, y+1, PX-2, PX-2);
+        ctx.fillStyle = `rgba(255,60,60,${pulse*0.15})`;
+        ctx.fillRect(x+2, y+2, PX-4, PX-4);
+      } else if(pit.state === 'open'){
+        // Open pit: black hole
+        ctx.fillStyle = '#000';
+        ctx.fillRect(x+1, y+1, PX-2, PX-2);
+        // Event horizon glow
+        const glow = Math.sin(time*3)*0.2 + 0.3;
+        ctx.strokeStyle = `rgba(128,0,200,${glow})`;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x+1, y+1, PX-2, PX-2);
+        // Spiral particles
+        ctx.fillStyle = `rgba(128,0,200,${glow*0.5})`;
+        ctx.fillRect(x+PX/2-1, y+2, 1, 1);
+        ctx.fillRect(x+PX-3, y+PX/2-1, 1, 1);
+        ctx.fillRect(x+2, y+PX-3, 1, 1);
+        ctx.fillRect(x+PX/2-1, y+PX-3, 1, 1);
+      }
+    });
+  }
+
+  // ===== METEORS =====
+  function drawMeteors(meteors){
+    if(!meteors) return;
+    meteors.forEach(m => {
+      const mx = m.x + shake.x, my = m.y + shake.y;
+      // Tail
+      ctx.fillStyle = `rgba(255,120,40,${m.life/m.maxLife*0.4})`;
+      for(let i=1;i<=3;i++){
+        ctx.fillRect(mx - m.vx*i*2, my - m.vy*i*2, 2, 2);
+      }
+      // Head
+      ctx.fillStyle = '#ff8040';
+      ctx.fillRect(mx, my, 3, 3);
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(mx, my, 1, 1);
+    });
+  }
+
+  // ===== APPLE =====
   function drawApple(c, r, type='normal'){
     const p = getTheme();
     const x = c*PX + shake.x, y = r*PX + shake.y;
@@ -154,6 +217,7 @@ const Renderer = (function(){
     ctx.fillRect(x+PX/2, y, 1, 3);
   }
 
+  // ===== SNAKE =====
   function drawSnake(snake, dir){
     const p = getTheme();
     for(let i=snake.length-1;i>=0;i--){
@@ -190,6 +254,7 @@ const Renderer = (function(){
     }
   }
 
+  // ===== OBSTACLES =====
   function drawObstacles(obstacles){
     const p = getTheme();
     obstacles.forEach(o => {
@@ -200,6 +265,7 @@ const Renderer = (function(){
     });
   }
 
+  // ===== ENEMIES =====
   function drawEnemies(enemies){
     enemies.forEach(e => {
       const x = e.x*PX + shake.x, y = e.y*PX + shake.y;
@@ -212,6 +278,7 @@ const Renderer = (function(){
   function updateParticles(){ particles = particles.filter(p => p.update()); }
   function drawParticles(){ particles.forEach(p => p.draw(ctx)); }
 
+  // ===== MAIN FRAME =====
   function drawFrame(gameState){
     time += 0.016;
     updateShake();
@@ -220,9 +287,11 @@ const Renderer = (function(){
 
     drawBackground();
     drawGrid(gameState.tiles);
+    if(gameState.pits) drawPits(gameState.pits);
     if(gameState.obstacles) drawObstacles(gameState.obstacles);
     if(gameState.enemies) drawEnemies(gameState.enemies);
     if(gameState.apple) drawApple(gameState.apple.x, gameState.apple.y, gameState.apple.type);
+    if(gameState.meteors) drawMeteors(gameState.meteors);
     drawSnake(gameState.snake, gameState.dir);
     drawParticles();
     drawFloatingTexts();
@@ -232,6 +301,6 @@ const Renderer = (function(){
     COLS, ROWS, PX, cv, ctx,
     setTheme, getTheme, drawFrame,
     spawnParticles, addFloatingText, triggerShake,
-    THEMES
+    initStars
   };
 })();

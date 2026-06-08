@@ -13,18 +13,20 @@ const Menu = (function(){
     game: document.getElementById('screen-game')
   };
 
-  let currentScreen = 'menu';
+  let currentScreen = 'game'; // start in game (attract mode)
   let pendingScore = 0;
+  let gameMode = 'adventure';
 
   function show(name){
     Object.values(screens).forEach(s => s.classList.remove('active'));
-    screens[name].classList.add('active');
+    if(screens[name]) screens[name].classList.add('active');
     currentScreen = name;
     if(name !== 'game') Audio.stopAmbient();
   }
 
   function back(){ show('menu'); }
 
+  // Main menu buttons
   document.querySelectorAll('[data-action]').forEach(btn => {
     btn.addEventListener('click', () => {
       Audio.playMenuClick();
@@ -39,6 +41,7 @@ const Menu = (function(){
     });
   });
 
+  // Difficulty select
   document.querySelectorAll('[data-diff]').forEach(btn => {
     btn.addEventListener('click', () => {
       Audio.playMenuClick();
@@ -47,17 +50,81 @@ const Menu = (function(){
     });
   });
 
+  // Attract mode: tap to start
+  document.getElementById('btn-start').addEventListener('click', () => {
+    Audio.playMenuClick();
+    document.getElementById('overlay-start').classList.add('hidden');
+    Game.start();
+  });
+
+  // Attract mode: menu button
+  document.getElementById('btn-attract-menu').addEventListener('click', () => {
+    Audio.playMenuClick();
+    show('menu');
+  });
+
+  // Pause
+  document.getElementById('btn-pause').addEventListener('click', () => {
+    Audio.playMenuClick();
+    Game.pause();
+    document.getElementById('overlay-pause').classList.remove('hidden');
+  });
+  document.getElementById('btn-resume').addEventListener('click', () => {
+    Audio.playMenuClick();
+    document.getElementById('overlay-pause').classList.add('hidden');
+    Game.resume();
+  });
+  document.getElementById('btn-menu-from-pause').addEventListener('click', () => {
+    Audio.playMenuClick();
+    document.getElementById('overlay-pause').classList.add('hidden');
+    show('menu');
+  });
+  document.getElementById('btn-quit').addEventListener('click', () => {
+    Audio.playMenuClick();
+    document.getElementById('overlay-pause').classList.add('hidden');
+    show('menu');
+  });
+
+  // Game Over
+  document.getElementById('btn-retry').addEventListener('click', () => {
+    Audio.playMenuClick();
+    const diff = Storage.Settings.getOne('difficulty');
+    document.getElementById('overlay-over').classList.add('hidden');
+    Game.init(diff, gameMode);
+    Game.start();
+  });
+  document.getElementById('btn-menu-from-over').addEventListener('click', () => {
+    Audio.playMenuClick();
+    document.getElementById('overlay-over').classList.add('hidden');
+    show('menu');
+  });
+
+  // Name input — FIXED
+  document.getElementById('name-submit').addEventListener('click', () => {
+    const rawName = document.getElementById('name-input').value;
+    const name = (rawName && rawName.trim()) ? rawName.trim() : 'KNIGHT';
+    Storage.Leaderboard.add(name, pendingScore);
+    show('leaderboard');
+    populateLeaderboard();
+  });
+
+  document.getElementById('name-skip').addEventListener('click', () => {
+    Audio.playMenuClick();
+    show('menu');
+  });
+
+  // Also submit on Enter key
+  document.getElementById('name-input').addEventListener('keydown', e => {
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      document.getElementById('name-submit').click();
+    }
+  });
+
   function populateThemes(){
     const grid = document.getElementById('theme-grid');
     const current = Storage.Settings.getOne('theme');
-    const list = [
-      {id:'royal', name:'Royal Courtyard', bg:'#0a0a1a', accent:'#c9a840'},
-      {id:'dungeon', name:'Dungeon Depths', bg:'#0a000a', accent:'#c080ff'},
-      {id:'forest', name:'Forest Quest', bg:'#000a00', accent:'#80d040'},
-      {id:'volcano', name:'Volcanic Keep', bg:'#1a0500', accent:'#ff8040'},
-      {id:'icy', name:'Icy Tower', bg:'#000a14', accent:'#80e0ff'},
-      {id:'mystic', name:'Mystic Realm', bg:'#0a0014', accent:'#c080ff'}
-    ];
+    const list = Object.entries(CONFIG.themes).map(([id, t]) => ({id, ...t}));
     grid.innerHTML = '';
     list.forEach(t => {
       const card = document.createElement('div');
@@ -108,6 +175,7 @@ const Menu = (function(){
     const s = Storage.Settings.get();
     const setToggle = (id, key) => {
       const btn = document.getElementById(id);
+      if(!btn) return;
       btn.textContent = s[key] ? 'ON' : 'OFF';
       btn.className = 'toggle ' + (s[key] ? 'on' : '');
       btn.onclick = () => {
@@ -140,52 +208,8 @@ const Menu = (function(){
     }
   }
 
-  document.getElementById('name-submit').addEventListener('click', () => {
-    const name = document.getElementById('name-input').value.trim() || 'KNIGHT';
-    Storage.Leaderboard.add(name, pendingScore);
-    document.getElementById('screen-name').classList.remove('active');
-    populateLeaderboard();
-    show('leaderboard');
-  });
-  document.getElementById('name-skip').addEventListener('click', () => {
-    document.getElementById('screen-name').classList.remove('active');
-    show('menu');
-  });
-
-  document.getElementById('btn-start').addEventListener('click', () => {
-    Audio.playMenuClick();
-    document.getElementById('overlay-start').classList.add('hidden');
-    Game.start();
-  });
-  document.getElementById('btn-pause').addEventListener('click', () => {
-    Audio.playMenuClick();
-    Game.pause();
-    document.getElementById('overlay-pause').classList.remove('hidden');
-  });
-  document.getElementById('btn-resume').addEventListener('click', () => {
-    Audio.playMenuClick();
-    document.getElementById('overlay-pause').classList.add('hidden');
-    Game.resume();
-  });
-  document.getElementById('btn-quit').addEventListener('click', () => {
-    Audio.playMenuClick();
-    document.getElementById('overlay-pause').classList.add('hidden');
-    show('menu');
-  });
-  document.getElementById('btn-retry').addEventListener('click', () => {
-    Audio.playMenuClick();
-    const diff = Storage.Settings.getOne('difficulty');
-    document.getElementById('overlay-over').classList.add('hidden');
-    Game.init(diff, 'adventure');
-    Game.start();
-  });
-  document.getElementById('btn-menu').addEventListener('click', () => {
-    Audio.playMenuClick();
-    document.getElementById('overlay-over').classList.add('hidden');
-    show('menu');
-  });
-
   function startGame(mode){
+    gameMode = mode;
     const diff = Storage.Settings.getOne('difficulty');
     const theme = Storage.Settings.getOne('theme');
     Renderer.setTheme(theme);
@@ -199,12 +223,13 @@ const Menu = (function(){
 
   function updateHUD(){
     const s = Game.getState();
+    if(!s) return;
     document.getElementById('hud-score').textContent = Math.max(0, s.score);
     document.getElementById('hud-level').textContent = s.level;
     document.getElementById('hud-best').textContent = Storage.Stats.get().bestScore;
     const comboEl = document.getElementById('hud-combo');
     if(s.combo >= 2){
-      comboEl.textContent = `🔥 COMBO x${Math.min(s.combo, 5)}`;
+      comboEl.textContent = '🔥 x' + Math.min(s.combo, 5);
       comboEl.classList.remove('hidden');
     } else {
       comboEl.classList.add('hidden');
@@ -217,11 +242,14 @@ const Menu = (function(){
       document.getElementById('name-score').textContent = score;
       document.getElementById('name-input').value = '';
       show('name');
+      // Focus input after screen transition
+      setTimeout(() => document.getElementById('name-input').focus(), 100);
       return true;
     }
     return false;
   }
 
+  // Hover sounds
   document.querySelectorAll('.btn, .theme-card, .toggle').forEach(el => {
     el.addEventListener('mouseenter', () => Audio.playMenuHover());
   });

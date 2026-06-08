@@ -80,6 +80,8 @@ const Audio = (function(){
   }
   function playMenuHover(){ if(!mutedSfx){ init(); resume(); noise(0.03, 0.05, 3000); } }
   function playMenuClick(){ if(!mutedSfx){ init(); resume(); pluck(440, 0.05, 0.15); } }
+  function playPitWarning(){ if(!mutedSfx){ init(); resume(); tone(300, 0.08, 'square', 0.1); } }
+  function playPitOpen(){ if(!mutedSfx){ init(); resume(); noise(0.2, 0.15, 100); } }
 
   function startAmbient(){
     if(!ctx || mutedMusic || ambientNode) return;
@@ -99,5 +101,5 @@ const Audio = (function(){
   function setMute(sfx, music){ mutedSfx=!sfx; mutedMusic=!music; if(mutedMusic) stopAmbient(); }
   function isReady(){ return !!ctx; }
 
-  return { init, resume, playEat, playGolden, playPoison, playCombo, playLevelUp, playGameOver, playMenuHover, playMenuClick, startAmbient, stopAmbient, setMute, isReady };
+  return { init, resume, playEat, playGolden, playPoison, playCombo, playLevelUp, playGameOver, playMenuHover, playMenuClick, playPitWarning, playPitOpen, startAmbient, stopAmbient, setMute, isReady };
 })();

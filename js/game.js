@@ -2,23 +2,15 @@
  * GAME LOGIC — Arkeen Serpent
  */
 const Game = (function(){
-  const COLS = 40, ROWS = 40;
-
-  const DIFFICULTY = {
-    easy:     {speed:150, poison:false, obstacle:false, movingObs:false, enemy:false, trap:false},
-    normal:   {speed:120, poison:true,  obstacle:false, movingObs:false, enemy:false, trap:false},
-    hard:     {speed:100, poison:true,  obstacle:true,  movingObs:false, enemy:false, trap:false},
-    expert:   {speed:80,  poison:true,  obstacle:true,  movingObs:true,  enemy:false, trap:false},
-    nightmare:{speed:60,  poison:true,  obstacle:true,  movingObs:true,  enemy:true,  trap:true}
-  };
+  const COLS = CONFIG.COLS, ROWS = CONFIG.ROWS;
 
   let state = {};
-  let diffSettings = DIFFICULTY.normal;
+  let diffSettings = CONFIG.difficulty.normal;
   let mode = 'adventure';
 
   function init(diffName='normal', gameMode='adventure'){
     mode = gameMode;
-    diffSettings = DIFFICULTY[diffName] || DIFFICULTY.normal;
+    diffSettings = CONFIG.difficulty[diffName] || CONFIG.difficulty.normal;
     const startX = 20, startY = 20;
     state = {
       snake: [{x:startX,y:startY},{x:startX-1,y:startY},{x:startX-2,y:startY},{x:startX-3,y:startY}],
@@ -34,13 +26,18 @@ const Game = (function(){
       applesEaten: 0,
       obstacles: [],
       enemies: [],
+      pits: [],
+      meteors: [],
       tiles: [],
       running: false,
       gameOver: false,
       moveTimer: 0,
       moveInterval: diffSettings.speed,
       goldenTimer: 0,
-      startTime: Date.now()
+      pitTimer: 0,
+      meteorTimer: 0,
+      startTime: Date.now(),
+      frameCount: 0
     };
     generateTiles();
     spawnApple();
@@ -62,13 +59,15 @@ const Game = (function(){
 
   function getAdventureRules(){
     const s = state.score;
+    const adv = CONFIG.adventure;
     return {
-      poison: s >= 10,
-      golden: s >= 20,
-      obstacle: s >= 30,
-      movingObs: s >= 40,
-      enemy: s >= 50,
-      trap: s >= 75
+      poison: s >= adv.poison,
+      golden: s >= adv.golden,
+      obstacle: s >= adv.obstacle,
+      movingObs: s >= adv.movingObs,
+      pits: s >= adv.pits,
+      enemy: s >= adv.enemy,
+      trap: s >= adv.trap
     };
   }
 
@@ -79,26 +78,29 @@ const Game = (function(){
       golden: true,
       obstacle: diffSettings.obstacle,
       movingObs: diffSettings.movingObs,
+      pits: diffSettings.pits,
       enemy: diffSettings.enemy,
       trap: diffSettings.trap
     };
   }
 
+  // ===== SPAWNING =====
   function spawnApple(){
     const rules = getActiveRules();
     const available = [];
     for(let r=1;r<ROWS-1;r++)for(let c=1;c<COLS-1;c++){
       if(state.snake.some(s=>s.x===c&&s.y===r)) continue;
       if(state.obstacles.some(o=>o.x===c&&o.y===r)) continue;
+      if(state.pits.some(p=>p.x===c&&p.y===r && p.state==='open')) continue;
       available.push({x:c,y:r});
     }
     if(available.length===0) return;
     const pos = available[Math.floor(Math.random()*available.length)];
     let type = 'normal';
-    if(rules.golden && state.goldenTimer <= 0 && Math.random() < 0.15) type = 'golden';
-    else if(rules.poison && Math.random() < 0.12) type = 'poison';
+    if(rules.golden && state.goldenTimer <= 0 && Math.random() < 0.12) type = 'golden';
+    else if(rules.poison && Math.random() < 0.1) type = 'poison';
     state.apple = {x: pos.x, y: pos.y, type: type};
-    if(type === 'golden') state.goldenTimer = 400;
+    if(type === 'golden') state.goldenTimer = CONFIG.pits.spawnInterval;
   }
 
   function spawnObstacle(){
@@ -111,6 +113,7 @@ const Game = (function(){
       if(state.snake.some(s=>s.x===c&&s.y===r)) continue;
       if(state.apple && state.apple.x===c && state.apple.y===r) continue;
       if(state.obstacles.some(o=>o.x===c&&o.y===r)) continue;
+      if(state.pits.some(p=>p.x===c&&p.y===r)) continue;
       state.obstacles.push({x:c, y:r, moving: false});
       break;
     }
@@ -128,6 +131,71 @@ const Game = (function(){
     state.enemies.push({x:ex, y:ey, dir:{x:0,y:0}, timer:0});
   }
 
+  // ===== PITS =====
+  function updatePits(){
+    const rules = getActiveRules();
+    if(!rules.pits) return;
+
+    // Spawn new pit
+    state.pitTimer++;
+    if(state.pitTimer >= CONFIG.pits.spawnInterval && state.pits.length < CONFIG.pits.maxActive){
+      state.pitTimer = 0;
+      let attempts = 0;
+      while(attempts++ < 50){
+        const c = 3 + Math.floor(Math.random()*(COLS-6));
+        const r = 3 + Math.floor(Math.random()*(ROWS-6));
+        if(state.snake.some(s=>s.x===c&&s.y===r)) continue;
+        if(state.apple && state.apple.x===c && state.apple.y===r) continue;
+        if(state.obstacles.some(o=>o.x===c&&o.y===r)) continue;
+        if(state.pits.some(p=>p.x===c&&p.y===r)) continue;
+        state.pits.push({x:c, y:r, state:'warning', timer:0, maxTimer:CONFIG.pits.warning + CONFIG.pits.duration});
+        Audio.playPitWarning();
+        break;
+      }
+    }
+
+    // Update existing pits
+    state.pits = state.pits.filter(p => {
+      p.timer++;
+      if(p.state === 'warning' && p.timer >= CONFIG.pits.warning){
+        p.state = 'open';
+        Audio.playPitOpen();
+      }
+      if(p.state === 'open' && p.timer >= p.maxTimer){
+        return false; // pit closes
+      }
+      return true;
+    });
+  }
+
+  // ===== METEORS =====
+  function updateMeteors(){
+    const cfg = CONFIG.meteors;
+    if(Math.random() < cfg.spawnRate){
+      // Spawn meteor from top edge, random x
+      const mx = 10 + Math.random()*(COLS*CONFIG.PX - 20);
+      const angle = Math.PI/4 + (Math.random()-0.5)*0.5; // ~45 degrees
+      const speed = cfg.speedMin + Math.random()*(cfg.speedMax - cfg.speedMin);
+      state.meteors.push({
+        x: mx, y: -5,
+        vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed,
+        life: cfg.life, maxLife: cfg.life
+      });
+    }
+
+    state.meteors = state.meteors.filter(m => {
+      m.x += m.vx; m.y += m.vy; m.life--;
+      // Check collision with snake head
+      const head = state.snake[0];
+      const hx = head.x*CONFIG.PX, hy = head.y*CONFIG.PX;
+      if(Math.abs(m.x - hx - CONFIG.PX/2) < 6 && Math.abs(m.y - hy - CONFIG.PX/2) < 6){
+        die(); return false;
+      }
+      return m.life > 0 && m.y < ROWS*CONFIG.PX + 10;
+    });
+  }
+
+  // ===== ENEMIES & OBSTACLES =====
   function updateEnemies(){
     state.enemies.forEach(e => {
       e.timer++;
@@ -155,27 +223,34 @@ const Game = (function(){
       if(nx<=0 || nx>=COLS-1 || ny<=0 || ny>=ROWS-1) return;
       if(state.snake.some(s=>s.x===nx&&s.y===ny)) return;
       if(state.apple && state.apple.x===nx && state.apple.y===ny) return;
+      if(state.pits.some(p=>p.x===nx&&p.y===ny&&p.state==='open')) return;
       o.x = nx; o.y = ny;
     });
   }
 
+  // ===== MAIN UPDATE =====
   function update(dt){
     if(!state.running || state.gameOver) return;
     state.moveTimer += dt;
     state.comboTimer -= dt;
     state.goldenTimer -= dt;
+    state.frameCount++;
 
+    // Level up
     const needed = state.level * 50;
     if(state.xp >= needed){
       state.level++;
       state.xp -= needed;
       Audio.playLevelUp();
-      Renderer.addFloatingText(state.snake[0].x*Renderer.PX, state.snake[0].y*Renderer.PX, 'LEVEL UP!', '#ffd700', 50);
+      Renderer.addFloatingText(state.snake[0].x*CONFIG.PX, state.snake[0].y*CONFIG.PX, 'LEVEL UP!', '#ffd700', 50);
     }
 
     const rules = getActiveRules();
     if(rules.obstacle && state.score > 0 && state.score % 10 === 0 && state.obstacles.length === 0) spawnObstacle();
     if(rules.enemy && state.score > 0 && state.score % 15 === 0 && state.enemies.length === 0) spawnEnemy();
+
+    updatePits();
+    updateMeteors();
 
     if(state.moveTimer >= state.moveInterval){
       state.moveTimer = 0;
@@ -183,13 +258,20 @@ const Game = (function(){
       state.dir = dir;
       const head = {x: state.snake[0].x + dir.x, y: state.snake[0].y + dir.y};
 
+      // Wall collision
       if(head.x <= 0 || head.x >= COLS-1 || head.y <= 0 || head.y >= ROWS-1){ die(); return; }
+      // Self collision
       if(state.snake.some(s => s.x === head.x && s.y === head.y)){ die(); return; }
+      // Obstacle collision
       if(state.obstacles.some(o => o.x === head.x && o.y === head.y)){ die(); return; }
+      // Enemy collision
       if(state.enemies.some(e => e.x === head.x && e.y === head.y)){ die(); return; }
+      // Pit collision
+      if(state.pits.some(p => p.x === head.x && p.y === head.y && p.state === 'open')){ die(); return; }
 
       state.snake.unshift(head);
 
+      // Eat apple
       if(state.apple && head.x === state.apple.x && head.y === state.apple.y){
         const type = state.apple.type;
         let points = 1;
@@ -204,7 +286,7 @@ const Game = (function(){
             if(state.combo >= 2){
               const mult = Math.min(state.combo, 5);
               points *= mult;
-              Renderer.addFloatingText(head.x*Renderer.PX, head.y*Renderer.PX, `COMBO x${mult}`, '#ff6040', 40);
+              Renderer.addFloatingText(head.x*CONFIG.PX, head.y*CONFIG.PX, `COMBO x${mult}`, '#ff6040', 40);
               if(state.combo >= 3) Audio.playCombo(Math.min(state.combo, 4));
               if(state.combo >= 5) Renderer.triggerShake(3);
             }
@@ -215,7 +297,7 @@ const Game = (function(){
         state.score += points;
         state.xp += 15;
         state.applesEaten++;
-        if(points > 0) Renderer.spawnParticles(head.x*Renderer.PX + Renderer.PX/2, head.y*Renderer.PX + Renderer.PX/2, type==='golden'?'#ffd700':'#ff4040', 10, 3);
+        if(points > 0) Renderer.spawnParticles(head.x*CONFIG.PX + CONFIG.PX/2, head.y*CONFIG.PX + CONFIG.PX/2, type==='golden'?'#ffd700':'#ff4040', 10, 3);
         spawnApple();
         state.moveInterval = Math.max(diffSettings.speed * 0.6, state.moveInterval - 1);
       } else {
@@ -233,9 +315,10 @@ const Game = (function(){
     Audio.playGameOver();
     Renderer.triggerShake(5);
     const playTime = Math.floor((Date.now() - state.startTime)/1000);
-    Storage.Stats.addGame(Math.max(0, state.score), state.applesEaten, state.bestCombo, playTime);
-    const isHigh = Storage.Leaderboard.isHigh(Math.max(0, state.score));
-    Menu.showGameOver(Math.max(0, state.score), state.bestCombo, state.level, isHigh);
+    const finalScore = Math.max(0, state.score);
+    Storage.Stats.addGame(finalScore, state.applesEaten, state.bestCombo, playTime);
+    const isHigh = Storage.Leaderboard.isHigh(finalScore);
+    Menu.showGameOver(finalScore, state.bestCombo, state.level, isHigh);
   }
 
   function getState(){ return state; }

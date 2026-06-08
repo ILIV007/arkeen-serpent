@@ -1,32 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#0a0a1a">
-  <meta name="description" content="Arkeen Serpent - A Knight Adventure Arcade Game">
-  <title>Arkeen Serpent</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="manifest" href="manifest.json">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#050510">
+<meta name="description" content="Arkeen Serpent — Space Arcade Snake">
+<title>Arkeen Serpent</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="manifest" href="manifest.json">
 </head>
 <body>
 
 <div id="app">
 
+  <!-- GAME SCREEN (default / attract mode) -->
+  <div id="screen-game" class="screen active">
+    <div id="hud">
+      <div class="hud-left">
+        <span class="hud-badge">LVL <b id="hud-level">1</b></span>
+        <span class="hud-badge">⭐ <b id="hud-score">0</b></span>
+      </div>
+      <div class="hud-center">
+        <span class="hud-combo hidden" id="hud-combo">🔥 x2</span>
+      </div>
+      <div class="hud-right">
+        <span class="hud-badge">🏆 <b id="hud-best">0</b></span>
+        <button class="hud-btn" id="btn-pause">⏸</button>
+      </div>
+    </div>
+    <div id="canvas-wrap">
+      <canvas id="cv"></canvas>
+      <!-- Attract / Start Overlay -->
+      <div id="overlay-start" class="game-overlay">
+        <h2>✦ ARKEEN SERPENT ✦</h2>
+        <p>Guide the Cosmic Serpent<br>Swipe or Arrow Keys to Move</p>
+        <button class="btn btn-gold" id="btn-start">✦ TAP TO START ✦</button>
+        <button class="btn btn-menu-small" id="btn-attract-menu">⚙ MENU</button>
+      </div>
+      <!-- Pause Overlay -->
+      <div id="overlay-pause" class="game-overlay hidden">
+        <h2>⏸ PAUSED ⏸</h2>
+        <button class="btn btn-gold" id="btn-resume">✦ RESUME ✦</button>
+        <button class="btn" id="btn-menu-from-pause">🏰 MENU</button>
+        <button class="btn" id="btn-quit">✖ QUIT</button>
+      </div>
+      <!-- Game Over Overlay -->
+      <div id="overlay-over" class="game-overlay hidden">
+        <h2>✦ THE SERPENT FALLS ✦</h2>
+        <div class="over-stats">
+          <div>Score: <b id="over-score">0</b></div>
+          <div>Combo: <b id="over-combo">x0</b></div>
+          <div>Level: <b id="over-level">1</b></div>
+        </div>
+        <div id="over-rank" class="over-rank hidden">🏆 RANKED #<span id="over-rank-num">1</span></div>
+        <button class="btn btn-gold" id="btn-retry">✦ RISE AGAIN ✦</button>
+        <button class="btn" id="btn-menu-from-over">🏰 MENU</button>
+      </div>
+    </div>
+    <div id="swipe-hint">SWIPE TO MOVE</div>
+  </div>
+
   <!-- MAIN MENU -->
-  <div id="screen-menu" class="screen active">
+  <div id="screen-menu" class="screen">
     <div class="menu-crest">🐉</div>
     <h1 class="game-title">ARKEEN SERPENT</h1>
-    <p class="game-subtitle">The Knight's Quest</p>
+    <p class="game-subtitle">The Cosmic Quest</p>
     <div class="menu-buttons">
-      <button class="btn btn-gold" data-action="play">✦ PLAY ADVENTURE ✦</button>
+      <button class="btn btn-gold" data-action="play">✦ PLAY ✦</button>
       <button class="btn" data-action="difficulty">⚔ DIFFICULTY</button>
-      <button class="btn" data-action="themes">🏰 THEMES</button>
+      <button class="btn" data-action="themes">🌌 THEMES</button>
       <button class="btn" data-action="leaderboard">🏆 LEADERBOARD</button>
       <button class="btn" data-action="stats">📜 STATISTICS</button>
       <button class="btn" data-action="settings">⚙ SETTINGS</button>
     </div>
-    <div class="menu-footer">v1.0 · Knight Adventure</div>
+    <a class="telegram-link" href="https://t.me/ILIVIR3" target="_blank" rel="noopener">t.me/ILIVIR3</a>
+    <div class="menu-footer">v1.1 · Space Arcade</div>
   </div>
 
   <!-- DIFFICULTY SELECT -->
@@ -44,7 +92,7 @@
 
   <!-- THEME SELECT -->
   <div id="screen-themes" class="screen">
-    <h2 class="screen-title">🏰 CHOOSE REALM 🏰</h2>
+    <h2 class="screen-title">🌌 CHOOSE REALM 🌌</h2>
     <div class="theme-grid" id="theme-grid"></div>
     <button class="btn btn-back" data-action="back">◀ BACK</button>
   </div>
@@ -89,50 +137,9 @@
     </div>
   </div>
 
-  <!-- GAME CONTAINER -->
-  <div id="screen-game" class="screen">
-    <div id="hud">
-      <div class="hud-left">
-        <span class="hud-badge">LVL <b id="hud-level">1</b></span>
-        <span class="hud-badge">⭐ <b id="hud-score">0</b></span>
-      </div>
-      <div class="hud-center">
-        <span class="hud-combo hidden" id="hud-combo">🔥 COMBO x2</span>
-      </div>
-      <div class="hud-right">
-        <span class="hud-badge">🏆 <b id="hud-best">0</b></span>
-        <button class="hud-btn" id="btn-pause">⏸</button>
-      </div>
-    </div>
-    <div id="canvas-wrap">
-      <canvas id="cv"></canvas>
-      <div id="overlay-start" class="game-overlay">
-        <h2>✦ READY? ✦</h2>
-        <p>Swipe or use Arrow Keys<br>Guide the Serpent to the Crystal</p>
-        <button class="btn btn-gold" id="btn-start">✦ BEGIN ✦</button>
-      </div>
-      <div id="overlay-pause" class="game-overlay hidden">
-        <h2>⏸ PAUSED ⏸</h2>
-        <button class="btn btn-gold" id="btn-resume">✦ RESUME ✦</button>
-        <button class="btn" id="btn-quit">🏰 QUIT</button>
-      </div>
-      <div id="overlay-over" class="game-overlay hidden">
-        <h2>✦ THE SERPENT FALLS ✦</h2>
-        <div class="over-stats">
-          <div>Score: <b id="over-score">0</b></div>
-          <div>Combo: <b id="over-combo">x0</b></div>
-          <div>Level: <b id="over-level">1</b></div>
-        </div>
-        <div id="over-rank" class="over-rank hidden">🏆 RANKED #<span id="over-rank-num">1</span></div>
-        <button class="btn btn-gold" id="btn-retry">✦ RISE AGAIN ✦</button>
-        <button class="btn" id="btn-menu">🏰 MAIN MENU</button>
-      </div>
-    </div>
-    <div id="swipe-hint">SWIPE TO MOVE</div>
-  </div>
-
 </div>
 
+<script src="js/config.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/input.js"></script>
