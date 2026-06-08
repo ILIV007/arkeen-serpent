@@ -130,7 +130,6 @@ function handleCombo() {
   state.lastEatTime = now;
 }
 
-// FIX: Slower speed progression - 1.5ms per level, min 65ms, cap at level 20
 function checkLevelUp() {
   if (state.foodsEatenThisLevel >= 5) {
     state.foodsEatenThisLevel = 0;
@@ -145,6 +144,7 @@ function checkLevelUp() {
 }
 
 export function checkCollision() {
+  if (state.gameOver) return; // FIX: Prevent double death
   const head = state.snake[0];
   const gs = state.gridSize;
 
@@ -169,6 +169,7 @@ export function checkCollision() {
 }
 
 function triggerGameOver() {
+  if (state.gameOver) return; // FIX: Prevent double trigger
   setMode('gameover');
   state.gameOver = true;
   playSound('GAME_OVER');

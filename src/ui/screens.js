@@ -187,12 +187,12 @@ function renderMenuLeaderboard() {
   const list = document.getElementById('menuLeaderboardList');
   if (!list) return;
   if (state.leaderboard.length === 0) {
-    list.innerHTML = '<p class="empty-msg">No champions yet...</p>';
+    list.innerHTML = '<div class="empty-msg">No champions yet...</div>';
     return;
   }
   list.innerHTML = state.leaderboard.slice(0, 5).map((entry, i) => {
     const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
-    return `<div class="lb-entry"><span class="lb-rank ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''}">${medal}</span><span class="lb-name">${entry.name || 'Unknown'}</span><span class="lb-score">${entry.score}</span></div>`;
+    return `<div class="lb-entry"><span class="lb-rank ${i < 3 ? ['gold','silver','bronze'][i] : ''}">${medal}</span><span class="lb-name">${entry.name || 'Unknown'}</span><span class="lb-score">${entry.score}</span></div>`;
   }).join('');
 }
 
@@ -200,7 +200,7 @@ function renderAchievements() {
   const grid = document.getElementById('achievementsGrid');
   grid.innerHTML = Object.values(ACHIEVEMENTS).map(ach => {
     const unlocked = state.achievements[ach.id];
-    return `<div class="ach-card ${unlocked ? 'unlocked' : 'locked'}"><span class="ach-icon">${ach.icon}</span><div><span class="ach-title">${ach.title}</span><span class="ach-desc">${ach.desc}</span></div><span class="ach-status">${unlocked ? '✓' : '🔒'}</span></div>`;
+    return `<div class="ach-card ${unlocked ? 'unlocked' : 'locked'}"><span class="ach-icon">${ach.icon}</span><div><div class="ach-title">${ach.title}</div><div class="ach-desc">${ach.desc}</div></div><span class="ach-status">${unlocked ? '✓' : '🔒'}</span></div>`;
   }).join('');
 }
 
@@ -209,7 +209,8 @@ function updateUI() {
   document.getElementById('themeBadge').textContent = THEMES[state.settings.theme].name;
 }
 
-function restartGame() {
+// FIX: Exported so input.js can call the full reset on keyboard restart
+export function restartGame() {
   setMode('playing');
   state.score = 0;
   state.level = 1;

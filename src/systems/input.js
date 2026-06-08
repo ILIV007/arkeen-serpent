@@ -1,4 +1,5 @@
 import { state, setMode } from '../core/state.js';
+import { restartGame } from '../ui/screens.js';
 
 let locked = false;
 let touchStartX = 0;
@@ -21,7 +22,7 @@ export function initInput() {
 function onKeyDown(e) {
   if (state.mode !== 'playing') {
     if (e.key === 'Enter' || e.key === ' ') {
-      if (state.mode === 'menu') setMode('playing');
+      if (state.mode === 'menu') restartGame();
       else if (state.mode === 'gameover') restartGame();
       else if (state.mode === 'paused') setMode('playing');
     }
@@ -73,8 +74,4 @@ export function setDirection(dir) {
 
 export function applyNextDirection() {
   state.direction = state.nextDirection;
-}
-
-function restartGame() {
-  setMode('playing');
 }

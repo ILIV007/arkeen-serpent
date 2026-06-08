@@ -8,7 +8,7 @@ export function spawnParticles(x, y, type) {
   const theme = state.settings.theme;
   let colors;
   if (theme === 'moon') {
-    colors = ['#60a5fa', '#93c5fd', '#bfdbfe', '#dbeafe'];
+    colors = ['#f1f5f9', '#e2e8f0', '#cbd5e1', '#ffffff'];
   } else if (theme === 'emerald') {
     colors = ['#10b981', '#34d399', '#6ee7b7', '#a7f3d0'];
   } else if (theme === 'crimson') {

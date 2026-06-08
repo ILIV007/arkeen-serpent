@@ -458,6 +458,8 @@ function drawAmbient(ctx, theme) {
     drawFirefliesEffect(ctx, theme);
   } else if (theme.ambient === 'gold_dust') {
     drawGoldDust(ctx, theme);
+  } else if (theme.ambient === 'moon') {
+    drawMoon(ctx, theme);
   }
   drawMeteors(ctx, theme);
 }
@@ -549,6 +551,48 @@ function drawGoldDust(ctx, theme) {
     ctx.arc(x, y, Math.max(0.5, size), 0, Math.PI * 2);
     ctx.fill();
   }
+}
+
+// FIX: New moon ambient with a glowing moon in the sky
+function drawMoon(ctx, theme) {
+  drawStars(ctx, theme);
+
+  const t = Date.now() * 0.0003;
+  const moonX = canvas.width * 0.75 + Math.sin(t) * 20;
+  const moonY = canvas.height * 0.2 + Math.cos(t * 0.7) * 10;
+  const moonRadius = Math.min(canvas.width, canvas.height) * 0.12;
+
+  // Outer glow
+  const glowGrad = ctx.createRadialGradient(moonX, moonY, moonRadius * 0.5, moonX, moonY, moonRadius * 3);
+  glowGrad.addColorStop(0, 'rgba(220, 230, 255, 0.15)');
+  glowGrad.addColorStop(0.5, 'rgba(200, 210, 240, 0.05)');
+  glowGrad.addColorStop(1, 'transparent');
+  ctx.fillStyle = glowGrad;
+  ctx.beginPath();
+  ctx.arc(moonX, moonY, moonRadius * 3, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Moon body
+  const moonGrad = ctx.createRadialGradient(moonX - moonRadius * 0.2, moonY - moonRadius * 0.2, 0, moonX, moonY, moonRadius);
+  moonGrad.addColorStop(0, 'rgba(250, 250, 255, 0.9)');
+  moonGrad.addColorStop(0.8, 'rgba(230, 235, 245, 0.7)');
+  moonGrad.addColorStop(1, 'rgba(210, 220, 235, 0.4)');
+  ctx.fillStyle = moonGrad;
+  ctx.beginPath();
+  ctx.arc(moonX, moonY, moonRadius, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Moon craters (subtle)
+  ctx.fillStyle = 'rgba(180, 190, 210, 0.15)';
+  ctx.beginPath();
+  ctx.arc(moonX - moonRadius * 0.2, moonY + moonRadius * 0.1, moonRadius * 0.15, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(moonX + moonRadius * 0.3, moonY - moonRadius * 0.2, moonRadius * 0.1, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(moonX + moonRadius * 0.1, moonY + moonRadius * 0.35, moonRadius * 0.12, 0, Math.PI * 2);
+  ctx.fill();
 }
 
 function drawMeteors(ctx, theme) {
