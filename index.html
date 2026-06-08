@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Arkeen Serpent — Cosmic Arcade</title>
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+  <!-- Canvas Layer -->
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- UI Overlay Layer -->
+  <div id="uiLayer">
+
+    <!-- Main Menu -->
+    <div id="menuScreen" class="screen active">
+      <div class="menu-container">
+        <div class="logo-area">
+          <div class="serpent-icon">🐍</div>
+          <h1 class="game-title">ARKEEN SERPENT</h1>
+          <p class="game-subtitle">The Cosmic Quest</p>
+          <div class="title-glow"></div>
+        </div>
+
+        <nav class="menu-nav">
+          <button class="menu-btn primary" data-action="play">
+            <span class="btn-icon">▶</span>
+            <span class="btn-text">PLAY</span>
+          </button>
+          <button class="menu-btn" data-action="difficulty">
+            <span class="btn-icon">⚔</span>
+            <span class="btn-text">DIFFICULTY</span>
+            <span class="btn-badge" id="diffBadge">NORMAL</span>
+          </button>
+          <button class="menu-btn" data-action="themes">
+            <span class="btn-icon">🌌</span>
+            <span class="btn-text">REALMS</span>
+            <span class="btn-badge" id="themeBadge">VOID</span>
+          </button>
+          <button class="menu-btn" data-action="leaderboard">
+            <span class="btn-icon">🏆</span>
+            <span class="btn-text">LEADERBOARD</span>
+          </button>
+          <button class="menu-btn" data-action="achievements">
+            <span class="btn-icon">📜</span>
+            <span class="btn-text">TOME OF GLORY</span>
+          </button>
+          <button class="menu-btn" data-action="settings">
+            <span class="btn-icon">⚙</span>
+            <span class="btn-text">SETTINGS</span>
+          </button>
+          <button class="menu-btn" data-action="howtoplay">
+            <span class="btn-icon">❓</span>
+            <span class="btn-text">HOW TO PLAY</span>
+          </button>
+        </nav>
+
+        <div class="menu-footer">
+          <p class="version">v2.0 · Space Arcade</p>
+          <a href="https://t.me/ILIVIR3" target="_blank" class="credits">t.me/ILIVIR3</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Difficulty Selector -->
+    <div id="difficultyScreen" class="screen">
+      <div class="screen-header">
+        <button class="back-btn" data-back="menu">←</button>
+        <h2>⚔ CHOOSE DIFFICULTY ⚔</h2>
+      </div>
+      <div class="selector-grid">
+        <button class="select-card" data-diff="easy">
+          <span class="card-icon">🌱</span>
+          <span class="card-title">EASY</span>
+          <span class="card-desc">Slow & forgiving</span>
+        </button>
+        <button class="select-card selected" data-diff="normal">
+          <span class="card-icon">⚔</span>
+          <span class="card-title">NORMAL</span>
+          <span class="card-desc">Balanced challenge</span>
+        </button>
+        <button class="select-card" data-diff="hard">
+          <span class="card-icon">🔥</span>
+          <span class="card-title">HARD</span>
+          <span class="card-desc">Fast & deadly</span>
+        </button>
+        <button class="select-card" data-diff="insane">
+          <span class="card-icon">💀</span>
+          <span class="card-title">INSANE</span>
+          <span class="card-desc">Serpent god mode</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Theme/Realm Selector -->
+    <div id="themesScreen" class="screen">
+      <div class="screen-header">
+        <button class="back-btn" data-back="menu">←</button>
+        <h2>🌌 CHOOSE REALM 🌌</h2>
+      </div>
+      <div class="selector-grid themes">
+        <button class="select-card selected" data-theme="void">
+          <span class="card-icon">🌑</span>
+          <span class="card-title">VOID</span>
+          <span class="card-desc">Infinite darkness</span>
+        </button>
+        <button class="select-card" data-theme="moon">
+          <span class="card-icon">🌙</span>
+          <span class="card-title">MOON</span>
+          <span class="card-desc">Silver starlight</span>
+        </button>
+        <button class="select-card" data-theme="crimson">
+          <span class="card-icon">🩸</span>
+          <span class="card-title">CRIMSON</span>
+          <span class="card-desc">Blood nebula</span>
+        </button>
+        <button class="select-card" data-theme="nebula">
+          <span class="card-icon">✨</span>
+          <span class="card-title">NEBULA</span>
+          <span class="card-desc">Cosmic dust</span>
+        </button>
+        <button class="select-card" data-theme="golden">
+          <span class="card-icon">👑</span>
+          <span class="card-title">GOLDEN</span>
+          <span class="card-desc">Solar empire</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Leaderboard -->
+    <div id="leaderboardScreen" class="screen">
+      <div class="screen-header">
+        <button class="back-btn" data-back="menu">←</button>
+        <h2>🏆 TOP SERPENTS 🏆</h2>
+      </div>
+      <div class="leaderboard-list" id="leaderboardList">
+        <p class="empty-msg">No champions yet... Be the first!</p>
+      </div>
+    </div>
+
+    <!-- Achievements / Tome of Glory -->
+    <div id="achievementsScreen" class="screen">
+      <div class="screen-header">
+        <button class="back-btn" data-back="menu">←</button>
+        <h2>📜 TOME OF GLORY 📜</h2>
+      </div>
+      <div class="achievements-grid" id="achievementsGrid"></div>
+    </div>
+
+    <!-- Settings -->
+    <div id="settingsScreen" class="screen">
+      <div class="screen-header">
+        <button class="back-btn" data-back="menu">←</button>
+        <h2>⚙ SETTINGS ⚙</h2>
+      </div>
+      <div class="settings-list">
+        <label class="setting-row">
+          <span class="setting-name">Sound Effects</span>
+          <input type="checkbox" id="settingSound" checked>
+          <span class="toggle"></span>
+        </label>
+        <label class="setting-row">
+          <span class="setting-name">Ambient Music</span>
+          <input type="checkbox" id="settingMusic">
+          <span class="toggle"></span>
+        </label>
+        <label class="setting-row">
+          <span class="setting-name">Screen Shake</span>
+          <input type="checkbox" id="settingShake" checked>
+          <span class="toggle"></span>
+        </label>
+        <label class="setting-row">
+          <span class="setting-name">Particles</span>
+          <input type="checkbox" id="settingParticles" checked>
+          <span class="toggle"></span>
+        </label>
+        <label class="setting-row">
+          <span class="setting-name">Show Grid</span>
+          <input type="checkbox" id="settingGrid">
+          <span class="toggle"></span>
+        </label>
+        <button class="menu-btn danger" id="resetDataBtn">
+          <span class="btn-icon">🗑</span>
+          <span class="btn-text">RESET ALL DATA</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- How to Play -->
+    <div id="howtoScreen" class="screen">
+      <div class="screen-header">
+        <button class="back-btn" data-back="menu">←</button>
+        <h2>❓ HOW TO PLAY ❓</h2>
+      </div>
+      <div class="howto-content">
+        <div class="howto-section">
+          <h3>🎮 Controls</h3>
+          <p><strong>Desktop:</strong> Arrow Keys or WASD to move</p>
+          <p><strong>Mobile:</strong> Swipe in any direction</p>
+        </div>
+        <div class="howto-section">
+          <h3>🔥 Combo System</h3>
+          <p>Eat food quickly to build combos!</p>
+          <p>Each combo adds bonus score.</p>
+          <p>Combo resets after 2.5 seconds.</p>
+        </div>
+        <div class="howto-section">
+          <h3>🌟 Level Up</h3>
+          <p>Every 5 foods = Level Up</p>
+          <p>Speed increases slightly each level.</p>
+        </div>
+        <div class="howto-section">
+          <h3>⚔ Difficulty</h3>
+          <p>Easy: 150ms tick · Normal: 120ms · Hard: 90ms · Insane: 70ms</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- HUD (In-Game) -->
+    <div id="hud" class="hud hidden">
+      <div class="hud-top">
+        <div class="hud-left">
+          <div class="hud-stat">
+            <span class="stat-icon">⭐</span>
+            <span class="stat-value" id="hudScore">0</span>
+          </div>
+          <div class="hud-stat">
+            <span class="stat-icon">🏆</span>
+            <span class="stat-value" id="hudBest">0</span>
+          </div>
+        </div>
+        <div class="hud-center">
+          <div class="hud-stat level-stat">
+            <span class="stat-label">LVL</span>
+            <span class="stat-value" id="hudLevel">1</span>
+          </div>
+        </div>
+        <div class="hud-right">
+          <div class="hud-stat combo-stat hidden" id="hudComboBox">
+            <span class="stat-icon">🔥</span>
+            <span class="stat-value" id="hudCombo">x2</span>
+          </div>
+          <button class="hud-btn" id="pauseBtn">⏸</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pause Overlay -->
+    <div id="pauseScreen" class="overlay-screen hidden">
+      <div class="overlay-content">
+        <h2>⏸ PAUSED ⏸</h2>
+        <button class="menu-btn primary" data-action="resume">
+          <span class="btn-icon">▶</span> RESUME
+        </button>
+        <button class="menu-btn" data-action="restart">
+          <span class="btn-icon">🔄</span> RESTART
+        </button>
+        <button class="menu-btn" data-action="menu">
+          <span class="btn-icon">🏠</span> MAIN MENU
+        </button>
+      </div>
+    </div>
+
+    <!-- Game Over Overlay -->
+    <div id="gameoverScreen" class="overlay-screen hidden">
+      <div class="overlay-content">
+        <h2 class="gameover-title">✦ THE SERPENT FALLS ✦</h2>
+        <div class="gameover-stats">
+          <div class="go-stat">
+            <span class="go-label">Score</span>
+            <span class="go-value" id="goScore">0</span>
+          </div>
+          <div class="go-stat">
+            <span class="go-label">Combo</span>
+            <span class="go-value" id="goCombo">x0</span>
+          </div>
+          <div class="go-stat">
+            <span class="go-label">Level</span>
+            <span class="go-value" id="goLevel">1</span>
+          </div>
+          <div class="go-stat">
+            <span class="go-label">Best</span>
+            <span class="go-value" id="goBest">0</span>
+          </div>
+        </div>
+        <div class="name-entry hidden" id="nameEntry">
+          <p>✦ NEW HIGH SCORE ✦</p>
+          <input type="text" id="playerName" placeholder="Enter thy name" maxlength="12">
+          <button class="menu-btn primary" id="saveScoreBtn">SAVE</button>
+        </div>
+        <div class="gameover-actions">
+          <button class="menu-btn primary" data-action="restart">
+            <span class="btn-icon">🔄</span> TRY AGAIN
+          </button>
+          <button class="menu-btn" data-action="menu">
+            <span class="btn-icon">🏠</span> MENU
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Controls -->
+    <div id="mobileControls" class="mobile-controls hidden">
+      <div class="d-pad">
+        <button class="d-btn d-up" data-dir="UP">▲</button>
+        <button class="d-btn d-left" data-dir="LEFT">◀</button>
+        <button class="d-btn d-center">●</button>
+        <button class="d-btn d-right" data-dir="RIGHT">▶</button>
+        <button class="d-btn d-down" data-dir="DOWN">▼</button>
+      </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer"></div>
+
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
