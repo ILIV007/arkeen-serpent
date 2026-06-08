@@ -1,4 +1,5 @@
 :root {
+  /* Base dark theme (Void) */
   --bg: #050814;
   --bg-light: #0a1020;
   --bg-card: rgba(10, 16, 32, 0.92);
@@ -36,7 +37,7 @@ html, body {
   -webkit-user-select: none;
 }
 
-/* ===== CANVAS: pointer-events NONE ===== */
+/* ===== CANVAS ===== */
 #gameCanvas {
   position: fixed;
   top: 0;
@@ -48,7 +49,7 @@ html, body {
   pointer-events: none;
 }
 
-/* ===== UI LAYER: all pointer-events auto ===== */
+/* ===== UI LAYER ===== */
 #uiLayer {
   position: fixed;
   top: 0;
@@ -76,7 +77,7 @@ html, body {
   opacity: 1;
 }
 
-/* ===== MAIN MENU LAYOUT ===== */
+/* ===== MAIN MENU ===== */
 #menuScreen {
   align-items: center;
   justify-content: center;
@@ -94,7 +95,6 @@ html, body {
   position: relative;
 }
 
-/* Left side: Logo + Nav (centered) */
 .menu-main {
   display: flex;
   flex-direction: column;
@@ -151,7 +151,7 @@ html, body {
   text-transform: uppercase;
 }
 
-/* Right side: Leaderboard Sidebar — FIXED top-right */
+/* ===== SIDEBAR FIXED TOP-RIGHT ===== */
 .menu-sidebar {
   position: fixed;
   top: 20px;
@@ -321,7 +321,7 @@ html, body {
   color: var(--accent);
 }
 
-/* ===== SUB-SCREENS (Difficulty, Themes, etc) ===== */
+/* ===== SUB-SCREENS ===== */
 .screen-header {
   width: 100%;
   max-width: 520px;
@@ -364,7 +364,6 @@ html, body {
   border-color: var(--accent);
 }
 
-/* Sub-screen containers */
 #difficultyScreen, #themesScreen, #achievementsScreen, #settingsScreen, #howtoScreen {
   flex-direction: column;
   align-items: center;
@@ -735,7 +734,7 @@ input:checked + .toggle::after {
   background: rgba(201, 168, 76, 0.12);
 }
 
-/* ===== OVERLAY SCREENS (Pause / Game Over) ===== */
+/* ===== OVERLAY SCREENS ===== */
 .overlay-screen {
   position: fixed;
   inset: 0;
@@ -956,12 +955,10 @@ input:checked + .toggle::after {
   .gameover-stats { grid-template-columns: repeat(4, 1fr); }
 }
 
-/* Tablet: shrink sidebar */
 @media (max-width: 768px) {
   .menu-sidebar { width: 180px; }
 }
 
-/* Mobile: stack vertically, sidebar goes BELOW nav */
 @media (max-width: 599px) {
   .menu-layout {
     flex-direction: column;
@@ -994,7 +991,6 @@ input:checked + .toggle::after {
   .menu-nav { max-width: 100%; }
 }
 
-/* Short screens */
 @media (max-height: 640px) {
   .serpent-icon { font-size: 2.2rem; }
   .game-title { font-size: 1.6rem; }
@@ -1010,7 +1006,6 @@ input:checked + .toggle::after {
   .menu-footer { display: none; }
 }
 
-/* Touch devices */
 @media (hover: none) and (pointer: coarse) {
   .menu-btn:hover { transform: none; background: var(--bg-card); }
   .menu-btn:active { transform: scale(0.97); background: rgba(201, 168, 76, 0.12); }

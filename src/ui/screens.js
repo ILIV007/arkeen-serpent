@@ -20,7 +20,6 @@ const hud = document.getElementById('hud');
 const mobileControls = document.getElementById('mobileControls');
 
 export function initScreens() {
-  // ===== EVENT DELEGATION on uiLayer =====
   const uiLayer = document.getElementById('uiLayer');
 
   uiLayer.addEventListener('click', (e) => {
@@ -43,7 +42,6 @@ export function initScreens() {
     }
   });
 
-  // Back buttons
   uiLayer.addEventListener('click', (e) => {
     const backBtn = e.target.closest('.back-btn');
     if (!backBtn) return;
@@ -51,7 +49,6 @@ export function initScreens() {
     showScreen('menu');
   });
 
-  // Difficulty selector
   uiLayer.addEventListener('click', (e) => {
     const card = e.target.closest('#difficultyScreen .select-card[data-diff]');
     if (!card) return;
@@ -66,7 +63,6 @@ export function initScreens() {
     showToast(`Difficulty: ${DIFFICULTY[diff].label}`);
   });
 
-  // Theme selector
   uiLayer.addEventListener('click', (e) => {
     const card = e.target.closest('#themesScreen .select-card[data-theme]');
     if (!card) return;
@@ -80,7 +76,6 @@ export function initScreens() {
     showToast(`Realm: ${THEMES[theme].name}`);
   });
 
-  // Settings toggles
   const bindToggle = (id, key) => {
     const el = document.getElementById(id);
     if (el) {
@@ -97,7 +92,6 @@ export function initScreens() {
   bindToggle('settingParticles', 'particles');
   bindToggle('settingGrid', 'grid');
 
-  // Reset data
   document.getElementById('resetDataBtn')?.addEventListener('click', () => {
     if (confirm('Are you sure? ALL data will be lost forever.')) {
       resetAllData();
@@ -106,7 +100,6 @@ export function initScreens() {
     }
   });
 
-  // Pause button
   document.getElementById('pauseBtn')?.addEventListener('click', () => {
     if (state.mode === 'playing') {
       setMode('paused');
@@ -114,7 +107,6 @@ export function initScreens() {
     }
   });
 
-  // Save score
   document.getElementById('saveScoreBtn')?.addEventListener('click', () => {
     const name = document.getElementById('playerName').value.trim() || 'Anonymous';
     const entry = state.leaderboard.find(e => e.score === state.score && !e.name);
@@ -128,18 +120,14 @@ export function initScreens() {
 }
 
 function showScreen(name) {
-  // Hide ALL screens and overlays
   Object.values(screens).forEach(s => s.classList.remove('active'));
   Object.values(overlays).forEach(o => o.classList.remove('active'));
-
-  // Show requested screen
   if (screens[name]) screens[name].classList.add('active');
 }
 
 export function updateScreenVisibility() {
   const mode = state.mode;
 
-  // Hide everything first
   Object.values(screens).forEach(s => s.classList.remove('active'));
   Object.values(overlays).forEach(o => o.classList.remove('active'));
   hud.classList.add('hidden');
@@ -184,8 +172,10 @@ function renderGameOver() {
   document.getElementById('goLevel').textContent = state.level;
   document.getElementById('goBest').textContent = state.best;
   const nameEntry = document.getElementById('nameEntry');
-  // Check if current score is in top 5 of leaderboard
-  const isTop5 = state.score > 0 && (state.leaderboard.length <= 5 || state.score >= state.leaderboard[4].score);
+  // Check if current score is in top 5
+  const top5Scores = state.leaderboard.slice(0, 5).map(e => e.score);
+  const minTop5 = top5Scores.length < 5 ? 0 : Math.min(...top5Scores);
+  const isTop5 = state.score > 0 && (state.leaderboard.length < 5 || state.score >= minTop5);
   if (isTop5) {
     nameEntry.classList.remove('hidden');
     document.getElementById('playerName').value = '';

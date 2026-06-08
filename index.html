@@ -18,7 +18,7 @@
     <!-- ===== MAIN MENU ===== -->
     <div id="menuScreen" class="screen active">
       <div class="menu-layout">
-        <!-- Left: Logo + Nav -->
+        <!-- Left: Logo + Nav (centered) -->
         <div class="menu-main">
           <div class="logo-area">
             <div class="serpent-icon">🐍</div>
@@ -38,12 +38,12 @@
               <span class="btn-badge" id="diffBadge">NORMAL</span>
             </button>
             <button class="menu-btn" data-action="themes">
-              <span class="btn-icon">🌌</span>
+              <span class="btn-icon">🌙</span>
               <span class="btn-text">REALMS</span>
               <span class="btn-badge" id="themeBadge">VOID</span>
             </button>
             <button class="menu-btn" data-action="achievements">
-              <span class="btn-icon">📜</span>
+              <span class="btn-icon">🏆</span>
               <span class="btn-text">TOME OF GLORY</span>
             </button>
             <button class="menu-btn" data-action="settings">
@@ -57,12 +57,12 @@
           </nav>
 
           <div class="menu-footer">
-            <p class="version">v2.1 · Space Arcade</p>
+            <p class="version">v2.2 — Space Arcade</p>
             <a href="https://t.me/ILIVIR3" target="_blank" class="credits">t.me/ILIVIR3</a>
           </div>
         </div>
 
-        <!-- Right: Leaderboard Sidebar -->
+        <!-- Right: Leaderboard Sidebar (fixed top-right) -->
         <div class="menu-sidebar">
           <div class="sidebar-card">
             <h3>🏆 TOP SERPENTS</h3>
@@ -77,7 +77,7 @@
     <!-- ===== DIFFICULTY ===== -->
     <div id="difficultyScreen" class="screen">
       <div class="screen-header">
-        <button class="back-btn" data-back="menu">←</button>
+        <button class="back-btn" data-back="menu">◀</button>
         <h2>⚔ CHOOSE DIFFICULTY ⚔</h2>
       </div>
       <div class="selector-grid">
@@ -93,22 +93,22 @@
         </button>
         <button class="select-card" data-diff="hard">
           <span class="card-icon">🔥</span>
-          <span class="card-title">HARD<</span>
+          <span class="card-title">HARD</span>
           <span class="card-desc">Fast & deadly</span>
         </button>
         <button class="select-card" data-diff="insane">
-          <span class="card-icon">📀</span>
+          <span class="card-icon">💀</span>
           <span class="card-title">INSANE</span>
           <span class="card-desc">Serpent god mode</span>
         </button>
       </div>
     </div>
 
-    <!-- ===== THEMES ====== -->
+    <!-- ===== THEMES ===== -->
     <div id="themesScreen" class="screen">
       <div class="screen-header">
-        <button class="back-btn" data-back="menu">←</button>
-        <h2>🌌 CHOOSE REAMM 🌌</h2>
+        <button class="back-btn" data-back="menu">◀</button>
+        <h2>🌙 CHOOSE REALM 🌙</h2>
       </div>
       <div class="selector-grid themes">
         <button class="select-card selected" data-theme="void">
@@ -121,29 +121,29 @@
           <span class="card-title">MOON</span>
           <span class="card-desc">Silver starlight</span>
         </button>
+        <button class="select-card" data-theme="emerald">
+          <span class="card-icon">🌿</span>
+          <span class="card-title">EMERALD</span>
+          <span class="card-desc">Verdant garden</span>
+        </button>
         <button class="select-card" data-theme="crimson">
-          <span class="card-icon">🩸</span>
+          <span class="card-icon">🔥</span>
           <span class="card-title">CRIMSON</span>
           <span class="card-desc">Blood nebula</span>
         </button>
-        <button class="select-card" data-theme="nebula">
-          <span class="card-icon">✨</span>
-          <span class="card-title">NEBULA</span>
-          <span class="card-desc">Cosmic dust</span>
-        </button>
-        <button class="select-card" data-theme="golden">
+        <button class="select-card" data-theme="royal">
           <span class="card-icon">👑</span>
-          <span class="card-title">GOLDEN</span>
-          <span class="card-desc">Solar empire</span>
+          <span class="card-title">ROYAL</span>
+          <span class="card-desc">Golden empire</span>
         </button>
       </div>
     </div>
 
-    <!-- ===== ACHIEVEMENTS ====== -->
+    <!-- ===== ACHIEVEMENTS ===== -->
     <div id="achievementsScreen" class="screen">
       <div class="screen-header">
-        <button class="back-btn" data-back="menu">←</button>
-        <h2>📜 TOME OF GLORY 📜</h2>
+        <button class="back-btn" data-back="menu">◀</button>
+        <h2>🏆 TOME OF GLORY 🏆</h2>
       </div>
       <div class="achievements-grid" id="achievementsGrid"></div>
     </div>
@@ -151,7 +151,7 @@
     <!-- ===== SETTINGS ===== -->
     <div id="settingsScreen" class="screen">
       <div class="screen-header">
-        <button class="back-btn" data-back="menu">←</button>
+        <button class="back-btn" data-back="menu">◀</button>
         <h2>⚙ SETTINGS ⚙</h2>
       </div>
       <div class="settings-list">
@@ -181,7 +181,7 @@
           <span class="toggle"></span>
         </label>
         <button class="menu-btn danger" id="resetDataBtn">
-          <span class="btn-icon">🗑</span>
+          <span class="btn-icon">⚠</span>
           <span class="btn-text">RESET ALL DATA</span>
         </button>
       </div>
@@ -190,7 +190,7 @@
     <!-- ===== HOW TO PLAY ===== -->
     <div id="howtoScreen" class="screen">
       <div class="screen-header">
-        <button class="back-btn" data-back="menu">←</button>
+        <button class="back-btn" data-back="menu">◀</button>
         <h2>❓ HOW TO PLAY ❓</h2>
       </div>
       <div class="howto-content">
@@ -265,7 +265,7 @@
     <!-- ===== GAME OVER ===== -->
     <div id="gameoverScreen" class="overlay-screen">
       <div class="overlay-content">
-        <h2 class="gameover-title">✦ THE SERPENT FALLS ✦</h2>
+        <h2 class="gameover-title">💀 THE SERPENT FALLS 💀</h2>
         <div class="gameover-stats">
           <div class="go-stat">
             <span class="go-label">Score</span>
@@ -277,7 +277,7 @@
           </div>
           <div class="go-stat">
             <span class="go-label">Level</span>
-            <span class="go-value" id="goLevel":1</span>
+            <span class="go-value" id="goLevel">1</span>
           </div>
           <div class="go-stat">
             <span class="go-label">Best</span>
@@ -285,7 +285,7 @@
           </div>
         </div>
         <div class="name-entry hidden" id="nameEntry">
-          <p>✦ NEW HIGH SCORE ✦</p>
+          <p>💀 NEW HIGH SCORE 💀</p>
           <input type="text" id="playerName" placeholder="Enter thy name" maxlength="12">
           <button class="menu-btn primary" id="saveScoreBtn">SAVE</button>
         </div>
