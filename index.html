@@ -8,17 +8,10 @@
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-
-  <!-- Canvas: Game + Background -->
   <canvas id="gameCanvas"></canvas>
-
-  <!-- UI Layer -->
   <div id="uiLayer">
-
-    <!-- ====== MAIN MENU ====== -->
     <div id="menuScreen" class="screen active">
       <div class="menu-layout">
-        <!-- Left: Logo + Nav (centered) -->
         <div class="menu-main">
           <div class="logo-area">
             <div class="serpent-icon">🐍</div>
@@ -26,7 +19,6 @@
             <h2 class="game-subtitle">SERPENT</h2>
             <p class="game-tagline">The Royal Snake Journey</p>
           </div>
-
           <nav class="menu-nav">
             <button class="menu-btn primary" data-action="play">
               <span class="btn-icon">▶</span>
@@ -55,14 +47,11 @@
               <span class="btn-text">HOW TO PLAY</span>
             </button>
           </nav>
-
           <div class="menu-footer">
-            <p class="version">v2.3 — Space Arcade</p>
+            <p class="version">v2.4 — Space Arcade</p>
             <a href="https://t.me/ILIVIR3" target="_blank" class="credits">t.me/ILIVIR3</a>
           </div>
         </div>
-
-        <!-- Right: Leaderboard Sidebar (fixed top-right) -->
         <div class="menu-sidebar">
           <div class="sidebar-card">
             <h3>🏆 TOP SERPENTS</h3>
@@ -74,7 +63,6 @@
       </div>
     </div>
 
-    <!-- ====== DIFFICULTY ====== -->
     <div id="difficultyScreen" class="screen">
       <div class="screen-header">
         <button class="back-btn" data-back="menu">↩</button>
@@ -104,7 +92,6 @@
       </div>
     </div>
 
-    <!-- ====== THEMES ====== -->
     <div id="themesScreen" class="screen">
       <div class="screen-header">
         <button class="back-btn" data-back="menu">↩</button>
@@ -119,7 +106,7 @@
         <button class="select-card" data-theme="moon">
           <span class="card-icon">🌙</span>
           <span class="card-title">MOON</span>
-          <span class="card-desc">Silver starlight</span>
+          <span class="card-desc">Silver moonlight</span>
         </button>
         <button class="select-card" data-theme="emerald">
           <span class="card-icon">🌿</span>
@@ -139,7 +126,6 @@
       </div>
     </div>
 
-    <!-- ====== ACHIEVEMENTS ====== -->
     <div id="achievementsScreen" class="screen">
       <div class="screen-header">
         <button class="back-btn" data-back="menu">↩</button>
@@ -148,7 +134,6 @@
       <div class="achievements-grid" id="achievementsGrid"></div>
     </div>
 
-    <!-- ====== SETTINGS ====== -->
     <div id="settingsScreen" class="screen">
       <div class="screen-header">
         <button class="back-btn" data-back="menu">↩</button>
@@ -187,7 +172,6 @@
       </div>
     </div>
 
-    <!-- ====== HOW TO PLAY ====== -->
     <div id="howtoScreen" class="screen">
       <div class="screen-header">
         <button class="back-btn" data-back="menu">↩</button>
@@ -212,12 +196,11 @@
         </div>
         <div class="howto-section">
           <h3>⚔ Difficulty</h3>
-          <p>Easy: 180ms · Normal: 140ms · Hard: 110ms · Insane: 85ms</p>
+          <p>Easy: 200ms · Normal: 160ms · Hard: 130ms · Insane: 100ms</p>
         </div>
       </div>
     </div>
 
-    <!-- ====== HUD ====== -->
     <div id="hud" class="hud hidden">
       <div class="hud-top">
         <div class="hud-left">
@@ -246,7 +229,6 @@
       </div>
     </div>
 
-    <!-- ====== PAUSE ====== -->
     <div id="pauseScreen" class="overlay-screen">
       <div class="overlay-content">
         <h2>⏸ PAUSED ⏸</h2>
@@ -262,7 +244,6 @@
       </div>
     </div>
 
-    <!-- ====== GAME OVER ====== -->
     <div id="gameoverScreen" class="overlay-screen">
       <div class="overlay-content">
         <h2 class="gameover-title">💀 THE SERPENT FALLS 💀</h2>
@@ -300,7 +281,6 @@
       </div>
     </div>
 
-    <!-- ====== MOBILE D-PAD ====== -->
     <div id="mobileControls" class="mobile-controls hidden">
       <div class="d-pad">
         <button class="d-btn d-up" data-dir="UP">▲</button>
@@ -311,11 +291,8 @@
       </div>
     </div>
 
-    <!-- ====== TOASTS ====== -->
     <div id="toastContainer"></div>
-
   </div>
-
   <script type="module" src="src/main.js"></script>
 </body>
 </html>
