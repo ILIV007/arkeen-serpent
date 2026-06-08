@@ -11,6 +11,7 @@ export function initInput() {
   canvas.addEventListener('touchstart', onTouchStart, { passive: true });
   canvas.addEventListener('touchend', onTouchEnd, { passive: true });
   canvas.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+
   document.querySelectorAll('.d-btn[data-dir]').forEach(btn => {
     btn.addEventListener('click', (e) => { e.preventDefault(); const dir = btn.dataset.dir; if (dir) setDirection(dir); });
     btn.addEventListener('touchstart', (e) => { e.preventDefault(); const dir = btn.dataset.dir; if (dir) setDirection(dir); }, { passive: true });
@@ -63,9 +64,8 @@ function onTouchEnd(e) {
 
 export function setDirection(dir) {
   if (locked) return;
-  const current = state.direction;
   const opposites = { UP: 'DOWN', DOWN: 'UP', LEFT: 'RIGHT', RIGHT: 'LEFT' };
-  if (opposites[dir] === current) return;
+  if (opposites[dir] === state.direction) return;
   state.nextDirection = dir;
   locked = true;
   setTimeout(() => { locked = false; }, 60);

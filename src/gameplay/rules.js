@@ -30,7 +30,7 @@ export function spawnSpecialFood() {
     attempts++;
   } while ((isOnSnake(pos) || (state.food && pos.x === state.food.x && pos.y === state.food.y)) && attempts < 100);
   state.specialFood = pos;
-  state.specialFoodTimer = 6000; // ms
+  state.specialFoodTimer = 6000;
 }
 
 function isOnSnake(pos) {
@@ -40,7 +40,6 @@ function isOnSnake(pos) {
 export function checkFood() {
   const head = state.snake[0];
   let ate = false;
-  let isSpecial = false;
 
   if (state.food && head.x === state.food.x && head.y === state.food.y) {
     ate = true;
@@ -55,7 +54,6 @@ export function checkFood() {
 
   if (state.specialFood && head.x === state.specialFood.x && head.y === state.specialFood.y) {
     ate = true;
-    isSpecial = true;
     state.specialFood = null;
     state.score += 5;
     state.stats.foodsEaten++;
@@ -73,7 +71,6 @@ export function checkFood() {
     if (!state.specialFood && Math.random() < 0.15) spawnSpecialFood();
   }
 
-  // Special food timer
   if (state.specialFood) {
     state.specialFoodTimer -= state.step;
     if (state.specialFoodTimer <= 0) state.specialFood = null;
@@ -106,9 +103,7 @@ function checkLevelUp() {
     playSound('LEVEL_UP');
     showToast(`🚀 LEVEL ${state.level}!`);
     addShake(3);
-    // Slightly increase speed
-    const diff = state.settings.difficulty;
-    const baseStep = { easy: 150, normal: 120, hard: 90, insane: 70 }[diff];
+    const baseStep = { easy: 150, normal: 120, hard: 90, insane: 70 }[state.settings.difficulty];
     state.step = Math.max(baseStep - (state.level - 1) * 3, 50);
   }
 }
@@ -116,14 +111,10 @@ function checkLevelUp() {
 export function checkCollision() {
   const head = state.snake[0];
   const gs = state.gridSize;
-
-  // Wall collision
   if (head.x < 0 || head.y < 0 || head.x >= gs || head.y >= gs) {
     triggerGameOver();
     return;
   }
-
-  // Self collision
   for (let i = 1; i < state.snake.length; i++) {
     if (head.x === state.snake[i].x && head.y === state.snake[i].y) {
       triggerGameOver();
@@ -138,22 +129,12 @@ function triggerGameOver() {
   playSound('GAME_OVER');
   addShake(12);
   spawnParticles(state.snake[0].x * state.cellSize + state.cellSize / 2, state.snake[0].y * state.cellSize + state.cellSize / 2, 'death');
-
-  // Update stats
   state.stats.gamesPlayed++;
   state.stats.totalScore += state.score;
   const playTime = Date.now() - state.startTime;
   state.stats.timePlayed += playTime;
-
-  // Update best
-  if (state.score > state.best) {
-    state.best = state.score;
-  }
-
-  // Check achievements
+  if (state.score > state.best) state.best = state.score;
   checkAchievements();
-
-  // Save
   saveLeaderboard();
   saveStats();
 }
@@ -169,7 +150,6 @@ function checkAchievements() {
       }
     }
   };
-
   if (state.stats.foodsEaten >= 1) unlock('first_blood');
   if (state.score >= 10) unlock('novice');
   if (state.score >= 50) unlock('warrior');

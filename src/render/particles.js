@@ -4,7 +4,6 @@ const particles = [];
 
 export function spawnParticles(x, y, type) {
   if (!state.settings.particles) return;
-  const theme = state.settings.theme;
   const colors = {
     food: ['#c9a84c', '#e8d5a3', '#ffaa00'],
     special: ['#ffd700', '#ffaa00', '#ffffff'],
@@ -14,7 +13,6 @@ export function spawnParticles(x, y, type) {
   };
   const palette = colors[type] || colors.food;
   const count = type === 'death' ? 30 : type === 'special' ? 20 : 12;
-
   for (let i = 0; i < count; i++) {
     const angle = Math.random() * Math.PI * 2;
     const speed = 1 + Math.random() * 4;

@@ -1,5 +1,5 @@
 import { state, initState, setMode } from './core/state.js';
-import { startLoop, stopLoop } from './core/loop.js';
+import { startLoop } from './core/loop.js';
 import { initInput, applyNextDirection } from './systems/input.js';
 import { playSound } from './systems/audio.js';
 import { initRenderer, render } from './render/renderer.js';
@@ -14,12 +14,8 @@ function init() {
   initRenderer();
   initInput();
   initScreens();
-
-  // Start with menu
   setMode('menu');
   updateScreenVisibility();
-
-  // Start render loop (always running for background/menu effects)
   startLoop(update, renderLoop, 16);
 }
 
@@ -30,8 +26,6 @@ function update() {
     checkFood();
     checkCollision();
   }
-
-  // Screen transition detection
   if (state.mode !== lastScreenMode) {
     lastScreenMode = state.mode;
     updateScreenVisibility();
@@ -42,7 +36,6 @@ function renderLoop() {
   render();
 }
 
-// Boot
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
 } else {

@@ -21,10 +21,7 @@ export function updateJuice() {
 
 export function applyShake(ctx) {
   if (shake > 0.5) {
-    ctx.translate(
-      (Math.random() - 0.5) * shake,
-      (Math.random() - 0.5) * shake
-    );
+    ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
   }
 }
 

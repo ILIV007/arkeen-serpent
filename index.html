@@ -2,26 +2,38 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Arkeen Serpent — Cosmic Arcade</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Arkeen Serpent — The Royal Snake Journey</title>
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
 
-  <!-- Canvas Layer -->
+  <!-- Canvas: Game + Ambient Background Only -->
   <canvas id="gameCanvas"></canvas>
 
-  <!-- UI Overlay Layer -->
+  <!-- UI Layer: DOM Only -->
   <div id="uiLayer">
 
-    <!-- Main Menu -->
+    <!-- MAIN MENU -->
     <div id="menuScreen" class="screen active">
+      <div class="menu-bg-ambient">
+        <div class="black-hole"></div>
+        <div class="meteors" id="meteors"></div>
+      </div>
       <div class="menu-container">
         <div class="logo-area">
           <div class="serpent-icon">🐍</div>
-          <h1 class="game-title">ARKEEN SERPENT</h1>
-          <p class="game-subtitle">The Cosmic Quest</p>
+          <h1 class="game-title">ARKEEN</h1>
+          <h2 class="game-subtitle">SERPENT</h2>
+          <p class="game-tagline">The Royal Snake Journey</p>
           <div class="title-glow"></div>
+        </div>
+
+        <div class="menu-leaderboard-preview">
+          <h3>🏆 TOP SERPENTS</h3>
+          <div id="menuLeaderboardList">
+            <p class="empty-msg">No champions yet...</p>
+          </div>
         </div>
 
         <nav class="menu-nav">
@@ -38,10 +50,6 @@
             <span class="btn-icon">🌌</span>
             <span class="btn-text">REALMS</span>
             <span class="btn-badge" id="themeBadge">VOID</span>
-          </button>
-          <button class="menu-btn" data-action="leaderboard">
-            <span class="btn-icon">🏆</span>
-            <span class="btn-text">LEADERBOARD</span>
           </button>
           <button class="menu-btn" data-action="achievements">
             <span class="btn-icon">📜</span>
@@ -64,7 +72,7 @@
       </div>
     </div>
 
-    <!-- Difficulty Selector -->
+    <!-- DIFFICULTY -->
     <div id="difficultyScreen" class="screen">
       <div class="screen-header">
         <button class="back-btn" data-back="menu">←</button>
@@ -94,7 +102,7 @@
       </div>
     </div>
 
-    <!-- Theme/Realm Selector -->
+    <!-- THEMES -->
     <div id="themesScreen" class="screen">
       <div class="screen-header">
         <button class="back-btn" data-back="menu">←</button>
@@ -129,18 +137,7 @@
       </div>
     </div>
 
-    <!-- Leaderboard -->
-    <div id="leaderboardScreen" class="screen">
-      <div class="screen-header">
-        <button class="back-btn" data-back="menu">←</button>
-        <h2>🏆 TOP SERPENTS 🏆</h2>
-      </div>
-      <div class="leaderboard-list" id="leaderboardList">
-        <p class="empty-msg">No champions yet... Be the first!</p>
-      </div>
-    </div>
-
-    <!-- Achievements / Tome of Glory -->
+    <!-- ACHIEVEMENTS -->
     <div id="achievementsScreen" class="screen">
       <div class="screen-header">
         <button class="back-btn" data-back="menu">←</button>
@@ -149,7 +146,7 @@
       <div class="achievements-grid" id="achievementsGrid"></div>
     </div>
 
-    <!-- Settings -->
+    <!-- SETTINGS -->
     <div id="settingsScreen" class="screen">
       <div class="screen-header">
         <button class="back-btn" data-back="menu">←</button>
@@ -188,7 +185,7 @@
       </div>
     </div>
 
-    <!-- How to Play -->
+    <!-- HOW TO PLAY -->
     <div id="howtoScreen" class="screen">
       <div class="screen-header">
         <button class="back-btn" data-back="menu">←</button>
@@ -197,23 +194,23 @@
       <div class="howto-content">
         <div class="howto-section">
           <h3>🎮 Controls</h3>
-          <p><strong>Desktop:</strong> Arrow Keys or WASD to move</p>
-          <p><strong>Mobile:</strong> Swipe in any direction</p>
+          <p><strong>Desktop:</strong> Arrow Keys or WASD</p>
+          <p><strong>Mobile:</strong> Swipe or D-Pad</p>
         </div>
         <div class="howto-section">
           <h3>🔥 Combo System</h3>
-          <p>Eat food quickly to build combos!</p>
+          <p>Eat fast to build combos!</p>
           <p>Each combo adds bonus score.</p>
-          <p>Combo resets after 2.5 seconds.</p>
+          <p>Combo resets after 2.5s.</p>
         </div>
         <div class="howto-section">
           <h3>🌟 Level Up</h3>
           <p>Every 5 foods = Level Up</p>
-          <p>Speed increases slightly each level.</p>
+          <p>Speed increases each level.</p>
         </div>
         <div class="howto-section">
           <h3>⚔ Difficulty</h3>
-          <p>Easy: 150ms tick · Normal: 120ms · Hard: 90ms · Insane: 70ms</p>
+          <p>Easy: 150ms · Normal: 120ms · Hard: 90ms · Insane: 70ms</p>
         </div>
       </div>
     </div>
@@ -247,7 +244,7 @@
       </div>
     </div>
 
-    <!-- Pause Overlay -->
+    <!-- PAUSE OVERLAY -->
     <div id="pauseScreen" class="overlay-screen hidden">
       <div class="overlay-content">
         <h2>⏸ PAUSED ⏸</h2>
@@ -263,7 +260,7 @@
       </div>
     </div>
 
-    <!-- Game Over Overlay -->
+    <!-- GAME OVER OVERLAY -->
     <div id="gameoverScreen" class="overlay-screen hidden">
       <div class="overlay-content">
         <h2 class="gameover-title">✦ THE SERPENT FALLS ✦</h2>
@@ -301,7 +298,7 @@
       </div>
     </div>
 
-    <!-- Mobile Controls -->
+    <!-- MOBILE D-PAD -->
     <div id="mobileControls" class="mobile-controls hidden">
       <div class="d-pad">
         <button class="d-btn d-up" data-dir="UP">▲</button>
@@ -312,7 +309,7 @@
       </div>
     </div>
 
-    <!-- Toast Notifications -->
+    <!-- TOASTS -->
     <div id="toastContainer"></div>
 
   </div>

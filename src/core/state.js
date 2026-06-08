@@ -1,9 +1,6 @@
 export const state = {
-  // Screen mode
   mode: 'menu',
   previousMode: null,
-
-  // Game state
   score: 0,
   best: 0,
   level: 1,
@@ -11,25 +8,17 @@ export const state = {
   lastEatTime: 0,
   comboMultiplier: 1,
   foodsEatenThisLevel: 0,
-
-  // Grid & sizing
   gridSize: 20,
   cellSize: 0,
   canvasWidth: 0,
   canvasHeight: 0,
-
-  // Snake
   snake: [],
   direction: 'RIGHT',
   nextDirection: 'RIGHT',
   growthQueue: 0,
-
-  // Food
   food: null,
   specialFood: null,
   specialFoodTimer: 0,
-
-  // Settings (loaded from storage)
   settings: {
     sound: true,
     music: false,
@@ -39,8 +28,6 @@ export const state = {
     difficulty: 'normal',
     theme: 'void',
   },
-
-  // Stats (persisted)
   stats: {
     gamesPlayed: 0,
     totalScore: 0,
@@ -48,26 +35,17 @@ export const state = {
     foodsEaten: 0,
     timePlayed: 0,
   },
-
-  // Leaderboard (persisted)
   leaderboard: [],
-
-  // Achievements (persisted)
   achievements: {},
-
-  // Runtime loop
   lastTime: 0,
   accumulator: 0,
   step: 120,
   paused: false,
   gameOver: false,
   startTime: 0,
-
-  // Mobile detection
   isMobile: false,
 };
 
-// Difficulty config
 export const DIFFICULTY = {
   easy: { step: 150, label: 'EASY' },
   normal: { step: 120, label: 'NORMAL' },
@@ -75,66 +53,64 @@ export const DIFFICULTY = {
   insane: { step: 70, label: 'INSANE' },
 };
 
-// Theme config
 export const THEMES = {
   void: {
     name: 'VOID',
-    bg: '#120a00',
+    bg: '#050814',
     snakeHead: '#c9a84c',
     snakeBody: '#8b7340',
     food: '#ff4444',
     specialFood: '#ffd700',
-    grid: '#1a1005',
+    grid: '#0a1020',
     particle: '#c9a84c',
     ambient: null,
   },
   moon: {
     name: 'MOON',
-    bg: '#0a0a1a',
-    snakeHead: '#c0c0e0',
-    snakeBody: '#8080a0',
+    bg: '#050814',
+    snakeHead: '#7dd3fc',
+    snakeBody: '#4a7090',
     food: '#a0a0ff',
     specialFood: '#ffffff',
-    grid: '#101025',
-    particle: '#c0c0e0',
+    grid: '#0a1020',
+    particle: '#7dd3fc',
     ambient: 'stars',
   },
   crimson: {
     name: 'CRIMSON',
-    bg: '#1a0005',
+    bg: '#0a0204',
     snakeHead: '#ff6b6b',
-    snakeBody: '#c94c4c',
+    snakeBody: '#a04040',
     food: '#ffaa00',
     specialFood: '#ff0000',
-    grid: '#250005',
+    grid: '#140205',
     particle: '#ff6b6b',
     ambient: 'fire',
   },
   nebula: {
     name: 'NEBULA',
-    bg: '#0a0518',
+    bg: '#060310',
     snakeHead: '#b084ff',
-    snakeBody: '#8050cc',
+    snakeBody: '#7050a0',
     food: '#00ffaa',
     specialFood: '#ff00ff',
-    grid: '#120a20',
+    grid: '#0a0518',
     particle: '#b084ff',
     ambient: 'nebula',
   },
   golden: {
     name: 'GOLDEN',
-    bg: '#1a1200',
+    bg: '#0a0800',
     snakeHead: '#ffd700',
     snakeBody: '#c9a84c',
     food: '#ff6600',
     specialFood: '#ffffff',
-    grid: '#251a00',
+    grid: '#141000',
     particle: '#ffd700',
     ambient: 'gold',
   },
 };
 
-// Achievement definitions
 export const ACHIEVEMENTS = {
   first_blood: { id: 'first_blood', title: 'First Blood', desc: 'Eat your first food', icon: '🍎' },
   novice: { id: 'novice', title: 'Novice Serpent', desc: 'Score 10 points', icon: '🐍' },
@@ -161,13 +137,13 @@ export function loadSettings() {
   try {
     const saved = localStorage.getItem('arkeen_settings');
     if (saved) Object.assign(state.settings, JSON.parse(saved));
-  } catch (e) { /* ignore */ }
+  } catch (e) {}
 }
 
 export function saveSettings() {
   try {
     localStorage.setItem('arkeen_settings', JSON.stringify(state.settings));
-  } catch (e) { /* ignore */ }
+  } catch (e) {}
 }
 
 export function loadStats() {
@@ -180,7 +156,7 @@ export function loadStats() {
     if (ach) state.achievements = JSON.parse(ach);
     const best = localStorage.getItem('arkeen_best');
     if (best) state.best = parseInt(best, 10);
-  } catch (e) { /* ignore */ }
+  } catch (e) {}
 }
 
 export function saveStats() {
@@ -189,7 +165,7 @@ export function saveStats() {
     localStorage.setItem('arkeen_leaderboard', JSON.stringify(state.leaderboard));
     localStorage.setItem('arkeen_achievements', JSON.stringify(state.achievements));
     localStorage.setItem('arkeen_best', String(state.best));
-  } catch (e) { /* ignore */ }
+  } catch (e) {}
 }
 
 export function resetAllData() {
@@ -204,7 +180,7 @@ export function resetAllData() {
     localStorage.removeItem('arkeen_leaderboard');
     localStorage.removeItem('arkeen_achievements');
     localStorage.removeItem('arkeen_best');
-  } catch (e) { /* ignore */ }
+  } catch (e) {}
 }
 
 export function initState() {

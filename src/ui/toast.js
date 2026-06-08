@@ -1,6 +1,6 @@
 const container = document.getElementById('toastContainer');
 
-export function showToast(message, duration = 2000) {
+export function showToast(message, duration = 2200) {
   const toast = document.createElement('div');
   toast.className = 'toast';
   toast.textContent = message;

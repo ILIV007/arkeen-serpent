@@ -21,16 +21,13 @@ const hud = document.getElementById('hud');
 const mobileControls = document.getElementById('mobileControls');
 
 export function initScreens() {
-  // Menu buttons
   document.querySelectorAll('#menuScreen .menu-btn[data-action]').forEach(btn => {
     btn.addEventListener('click', () => {
       playSound('MENU_CLICK');
-      const action = btn.dataset.action;
-      handleMenuAction(action);
+      handleMenuAction(btn.dataset.action);
     });
   });
 
-  // Back buttons
   document.querySelectorAll('.back-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       playSound('MENU_CLICK');
@@ -38,7 +35,6 @@ export function initScreens() {
     });
   });
 
-  // Difficulty selector
   document.querySelectorAll('#difficultyScreen .select-card').forEach(card => {
     card.addEventListener('click', () => {
       playSound('MENU_CLICK');
@@ -53,7 +49,6 @@ export function initScreens() {
     });
   });
 
-  // Theme selector
   document.querySelectorAll('#themesScreen .select-card').forEach(card => {
     card.addEventListener('click', () => {
       playSound('MENU_CLICK');
@@ -67,7 +62,6 @@ export function initScreens() {
     });
   });
 
-  // Settings toggles
   const bindToggle = (id, key) => {
     const el = document.getElementById(id);
     if (el) {
@@ -84,7 +78,6 @@ export function initScreens() {
   bindToggle('settingParticles', 'particles');
   bindToggle('settingGrid', 'grid');
 
-  // Reset data
   document.getElementById('resetDataBtn')?.addEventListener('click', () => {
     if (confirm('Are you sure? ALL data will be lost forever.')) {
       resetAllData();
@@ -93,7 +86,6 @@ export function initScreens() {
     }
   });
 
-  // Pause button
   document.getElementById('pauseBtn')?.addEventListener('click', () => {
     if (state.mode === 'playing') {
       setMode('paused');
@@ -101,19 +93,13 @@ export function initScreens() {
     }
   });
 
-  // Overlay buttons
   document.querySelectorAll('#pauseScreen .menu-btn[data-action]').forEach(btn => {
     btn.addEventListener('click', () => {
       playSound('MENU_CLICK');
       const action = btn.dataset.action;
-      if (action === 'resume') {
-        setMode('playing');
-        playSound('UNPAUSE');
-      } else if (action === 'restart') {
-        restartGame();
-      } else if (action === 'menu') {
-        setMode('menu');
-      }
+      if (action === 'resume') { setMode('playing'); playSound('UNPAUSE'); }
+      else if (action === 'restart') restartGame();
+      else if (action === 'menu') setMode('menu');
     });
   });
 
@@ -121,15 +107,11 @@ export function initScreens() {
     btn.addEventListener('click', () => {
       playSound('MENU_CLICK');
       const action = btn.dataset.action;
-      if (action === 'restart') {
-        restartGame();
-      } else if (action === 'menu') {
-        setMode('menu');
-      }
+      if (action === 'restart') restartGame();
+      else if (action === 'menu') setMode('menu');
     });
   });
 
-  // Save score button
   document.getElementById('saveScoreBtn')?.addEventListener('click', () => {
     const name = document.getElementById('playerName').value.trim() || 'Anonymous';
     const entry = state.leaderboard.find(e => e.score === state.score && !e.name);
@@ -139,35 +121,34 @@ export function initScreens() {
     showToast('Score saved!');
   });
 
-  // Initial UI update
   updateUI();
+  startMeteorSpawner();
+}
+
+function startMeteorSpawner() {
+  const container = document.getElementById('meteors');
+  if (!container) return;
+  setInterval(() => {
+    if (state.mode !== 'menu') return;
+    const meteor = document.createElement('div');
+    meteor.className = 'meteor';
+    meteor.style.left = (Math.random() * 80 + 10) + '%';
+    meteor.style.top = (Math.random() * 40) + '%';
+    meteor.style.animationDuration = (0.8 + Math.random() * 0.7) + 's';
+    container.appendChild(meteor);
+    setTimeout(() => { if (meteor.parentNode) meteor.parentNode.removeChild(meteor); }, 2000);
+  }, 3000 + Math.random() * 4000);
 }
 
 function handleMenuAction(action) {
   switch (action) {
-    case 'play':
-      restartGame();
-      break;
-    case 'difficulty':
-      showScreen('difficulty');
-      break;
-    case 'themes':
-      showScreen('themes');
-      break;
-    case 'leaderboard':
-      showScreen('leaderboard');
-      renderLeaderboard();
-      break;
-    case 'achievements':
-      showScreen('achievements');
-      renderAchievements();
-      break;
-    case 'settings':
-      showScreen('settings');
-      break;
-    case 'howtoplay':
-      showScreen('howto');
-      break;
+    case 'play': restartGame(); break;
+    case 'difficulty': showScreen('difficulty'); break;
+    case 'themes': showScreen('themes'); break;
+    case 'leaderboard': showScreen('leaderboard'); renderLeaderboard(); break;
+    case 'achievements': showScreen('achievements'); renderAchievements(); break;
+    case 'settings': showScreen('settings'); break;
+    case 'howtoplay': showScreen('howto'); break;
   }
 }
 
@@ -178,8 +159,6 @@ function showScreen(name) {
 
 export function updateScreenVisibility() {
   const mode = state.mode;
-
-  // Screens
   Object.values(screens).forEach(s => s.classList.remove('active'));
   Object.values(overlays).forEach(o => {
     o.classList.remove('active');
@@ -190,10 +169,10 @@ export function updateScreenVisibility() {
     screens.menu.classList.add('active');
     hud.classList.add('hidden');
     mobileControls.classList.add('hidden');
+    renderMenuLeaderboard();
   } else if (mode === 'playing' || mode === 'paused' || mode === 'gameover') {
     hud.classList.remove('hidden');
     if (state.isMobile) mobileControls.classList.remove('hidden');
-
     if (mode === 'paused') {
       overlays.pause.classList.remove('hidden');
       overlays.pause.classList.add('active');
@@ -203,7 +182,6 @@ export function updateScreenVisibility() {
       renderGameOver();
     }
   }
-
   updateHUD();
 }
 
@@ -211,7 +189,6 @@ function updateHUD() {
   document.getElementById('hudScore').textContent = state.score;
   document.getElementById('hudBest').textContent = state.best;
   document.getElementById('hudLevel').textContent = state.level;
-
   const comboBox = document.getElementById('hudComboBox');
   if (state.combo >= 2) {
     comboBox.classList.remove('hidden');
@@ -226,11 +203,9 @@ function renderGameOver() {
   document.getElementById('goCombo').textContent = `x${state.combo}`;
   document.getElementById('goLevel').textContent = state.level;
   document.getElementById('goBest').textContent = state.best;
-
   const nameEntry = document.getElementById('nameEntry');
-  const isNewHigh = state.score > 0 && state.score >= state.best && state.leaderboard.length <= 1 ||
-    state.leaderboard.some((e, i) => i < 10 && e.score === state.score);
-  if (isNewHigh && state.score > 0) {
+  const isNewHigh = state.score > 0 && state.leaderboard.length > 0 && state.score >= state.leaderboard[0].score;
+  if (isNewHigh || (state.score > 0 && state.leaderboard.length === 0)) {
     nameEntry.classList.remove('hidden');
     document.getElementById('playerName').value = '';
   } else {
@@ -247,13 +222,20 @@ function renderLeaderboard() {
   list.innerHTML = state.leaderboard.slice(0, 10).map((entry, i) => {
     const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
     const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`;
-    return `
-      <div class="lb-entry">
-        <span class="lb-rank ${rankClass}">${medal}</span>
-        <span class="lb-name">${entry.name || 'Unknown'}</span>
-        <span class="lb-score">${entry.score}</span>
-      </div>
-    `;
+    return `<div class="lb-entry"><span class="lb-rank ${rankClass}">${medal}</span><span class="lb-name">${entry.name || 'Unknown'}</span><span class="lb-score">${entry.score}</span></div>`;
+  }).join('');
+}
+
+function renderMenuLeaderboard() {
+  const list = document.getElementById('menuLeaderboardList');
+  if (!list) return;
+  if (state.leaderboard.length === 0) {
+    list.innerHTML = '<p class="empty-msg" style="font-size:0.8rem;padding:10px;">No champions yet...</p>';
+    return;
+  }
+  list.innerHTML = state.leaderboard.slice(0, 3).map((entry, i) => {
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉';
+    return `<div class="lb-entry"><span class="lb-rank">${medal}</span><span class="lb-name">${entry.name || 'Unknown'}</span><span class="lb-score">${entry.score}</span></div>`;
   }).join('');
 }
 
@@ -261,16 +243,7 @@ function renderAchievements() {
   const grid = document.getElementById('achievementsGrid');
   grid.innerHTML = Object.values(ACHIEVEMENTS).map(ach => {
     const unlocked = state.achievements[ach.id];
-    return `
-      <div class="ach-card ${unlocked ? 'unlocked' : 'locked'}">
-        <span class="ach-icon">${ach.icon}</span>
-        <div class="ach-info">
-          <span class="ach-title">${ach.title}</span>
-          <span class="ach-desc">${ach.desc}</span>
-        </div>
-        <span class="ach-status">${unlocked ? '✓' : '🔒'}</span>
-      </div>
-    `;
+    return `<div class="ach-card ${unlocked ? 'unlocked' : 'locked'}"><span class="ach-icon">${ach.icon}</span><div class="ach-info"><span class="ach-title">${ach.title}</span><span class="ach-desc">${ach.desc}</span></div><span class="ach-status">${unlocked ? '✓' : '🔒'}</span></div>`;
   }).join('');
 }
 
@@ -292,7 +265,6 @@ function restartGame() {
   state.startTime = Date.now();
   state.step = DIFFICULTY[state.settings.difficulty].step;
 
-  // Snake init
   const mid = Math.floor(state.gridSize / 2);
   state.snake = [
     { x: mid, y: mid },
@@ -302,17 +274,10 @@ function restartGame() {
   state.direction = 'RIGHT';
   state.nextDirection = 'RIGHT';
   state.growthQueue = 0;
-
-  // Food
   state.food = null;
   state.specialFood = null;
   state.specialFoodTimer = 0;
 
-  // Spawn food
-  spawnFoodSafe();
-}
-
-function spawnFoodSafe() {
   let pos;
   let attempts = 0;
   do {
