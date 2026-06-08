@@ -58,7 +58,6 @@ function generateFireflies() {
   }
 }
 
-// Helper: build rgba string from array [r, g, b, a]
 function rgba(arr, alpha) {
   if (alpha !== undefined) {
     return `rgba(${arr[0]}, ${arr[1]}, ${arr[2]}, ${alpha})`;
@@ -162,7 +161,6 @@ function drawGame(ctx, theme) {
     ctx.fillRect(ox + 2, oy + 2, cs - 4, cs - 4);
     ctx.fillStyle = '#777';
     ctx.fillRect(ox + 4, oy + 4, cs - 8, cs - 8);
-    // X mark
     ctx.strokeStyle = '#333';
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -235,82 +233,8 @@ function drawGame(ctx, theme) {
     ctx.restore();
   }
 
-  // ===== SNAKE =====
-  state.snake.forEach((seg, i) => {
-    const sx = offsetX + seg.x * cs;
-    const sy = offsetY + seg.y * cs;
-    const isHead = i === 0;
-    const size = isHead ? cs * 0.88 : cs * 0.72;
-    const pad = (cs - size) / 2;
-
-    if (isHead) {
-      const grad = ctx.createRadialGradient(sx + cs / 2, sy + cs / 2, 0, sx + cs / 2, sy + cs / 2, cs * 1.3);
-      grad.addColorStop(0, rgba(theme.snakeHeadGlow, 0.3));
-      grad.addColorStop(1, 'transparent');
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.arc(sx + cs / 2, sy + cs / 2, cs * 1.3, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    const alpha = isHead ? 1 : 0.5 + (state.snake.length - i) / state.snake.length * 0.5;
-    ctx.globalAlpha = alpha;
-
-    const segGrad = ctx.createRadialGradient(
-      sx + cs / 2, sy + cs / 2, 0,
-      sx + cs / 2, sy + cs / 2, size / 2
-    );
-    if (isHead) {
-      segGrad.addColorStop(0, lightenColor(theme.snakeHead, 20));
-      segGrad.addColorStop(1, theme.snakeHead);
-    } else {
-      segGrad.addColorStop(0, theme.snakeBody);
-      segGrad.addColorStop(1, theme.snakeBodyFade);
-    }
-
-    ctx.fillStyle = segGrad;
-    roundRect(ctx, sx + pad, sy + pad, size, size, isHead ? 6 : 4);
-    ctx.fill();
-    ctx.globalAlpha = 1;
-
-    if (isHead) {
-      ctx.fillStyle = '#000';
-      const eyeSize = cs * 0.1;
-      let ex1, ey1, ex2, ey2;
-      switch (state.direction) {
-        case 'RIGHT':
-          ex1 = sx + cs * 0.7; ey1 = sy + cs * 0.28;
-          ex2 = sx + cs * 0.7; ey2 = sy + cs * 0.72;
-          break;
-        case 'LEFT':
-          ex1 = sx + cs * 0.3; ey1 = sy + cs * 0.28;
-          ex2 = sx + cs * 0.3; ey2 = sy + cs * 0.72;
-          break;
-        case 'UP':
-          ex1 = sx + cs * 0.28; ey1 = sy + cs * 0.3;
-          ex2 = sx + cs * 0.72; ey2 = sy + cs * 0.3;
-          break;
-        case 'DOWN':
-          ex1 = sx + cs * 0.28; ey1 = sy + cs * 0.7;
-          ex2 = sx + cs * 0.72; ey2 = sy + cs * 0.7;
-          break;
-      }
-      ctx.beginPath();
-      ctx.arc(ex1, ey1, eyeSize, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(ex2, ey2, eyeSize, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#fff';
-      ctx.beginPath();
-      ctx.arc(ex1 - eyeSize * 0.2, ey1 - eyeSize * 0.2, eyeSize * 0.4, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(ex2 - eyeSize * 0.2, ey2 - eyeSize * 0.2, eyeSize * 0.4, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  });
+  // ===== SNAKE - NEW SERPENT DESIGN =====
+  drawSerpent(ctx, theme, offsetX, offsetY, cs);
 
   // ===== FOOD =====
   if (state.food) {
@@ -332,6 +256,197 @@ function drawGame(ctx, theme) {
   updateParticles();
   drawParticles(ctx);
   updateJuice();
+}
+
+function drawSerpent(ctx, theme, offsetX, offsetY, cs) {
+  if (!state.snake || state.snake.length === 0) return;
+
+  const snake = state.snake;
+  const dir = state.direction;
+
+  for (let i = snake.length - 1; i >= 0; i--) {
+    const seg = snake[i];
+    const sx = offsetX + seg.x * cs;
+    const sy = offsetY + seg.y * cs;
+    const isHead = i === 0;
+    const isTail = i === snake.length - 1;
+
+    let segSize;
+    if (isHead) {
+      segSize = cs * 0.92;
+    } else if (isTail) {
+      segSize = cs * 0.55;
+    } else {
+      const tailFactor = i / snake.length;
+      segSize = cs * (0.78 - tailFactor * 0.15);
+    }
+
+    const pad = (cs - segSize) / 2;
+    const cx = sx + cs / 2;
+    const cy = sy + cs / 2;
+
+    if (isHead) {
+      const headGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, cs * 1.5);
+      headGlow.addColorStop(0, rgba(theme.snakeHeadGlow, 0.25));
+      headGlow.addColorStop(1, 'transparent');
+      ctx.fillStyle = headGlow;
+      ctx.beginPath();
+      ctx.arc(cx, cy, cs * 1.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      const headGrad = ctx.createRadialGradient(
+        cx - cs * 0.15, cy - cs * 0.15, 0,
+        cx, cy, segSize / 2
+      );
+      headGrad.addColorStop(0, lightenColor(theme.snakeHead, 35));
+      headGrad.addColorStop(0.6, theme.snakeHead);
+      headGrad.addColorStop(1, darkenColor(theme.snakeHead, 20));
+
+      ctx.fillStyle = headGrad;
+      ctx.shadowColor = theme.snakeHead;
+      ctx.shadowBlur = 8;
+      roundRect(ctx, sx + pad, sy + pad, segSize, segSize, cs * 0.22);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+      ctx.beginPath();
+      ctx.ellipse(cx - cs * 0.1, cy - cs * 0.1, segSize * 0.25, segSize * 0.15, -0.3, 0, Math.PI * 2);
+      ctx.fill();
+
+      drawEyes(ctx, cx, cy, cs, dir, theme);
+      drawTongue(ctx, cx, cy, cs, dir, theme);
+
+    } else {
+      const bodyAlpha = isTail ? 0.6 : 0.75 + (1 - i / snake.length) * 0.25;
+      ctx.globalAlpha = bodyAlpha;
+
+      const bodyGrad = ctx.createRadialGradient(
+        cx - cs * 0.05, cy - cs * 0.05, 0,
+        cx, cy, segSize / 2
+      );
+
+      if (i === 1) {
+        bodyGrad.addColorStop(0, lightenColor(theme.snakeBody, 15));
+        bodyGrad.addColorStop(1, theme.snakeBody);
+      } else {
+        bodyGrad.addColorStop(0, theme.snakeBody);
+        bodyGrad.addColorStop(1, theme.snakeBodyFade);
+      }
+
+      ctx.fillStyle = bodyGrad;
+
+      const cornerRadius = isTail ? cs * 0.35 : cs * 0.18;
+      roundRect(ctx, sx + pad, sy + pad, segSize, segSize, cornerRadius);
+      ctx.fill();
+
+      if (!isTail && segSize > cs * 0.5) {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+        ctx.lineWidth = 1;
+        const scaleSize = segSize * 0.18;
+        ctx.beginPath();
+        ctx.arc(cx, cy, scaleSize, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      ctx.globalAlpha = 1;
+    }
+  }
+}
+
+function drawEyes(ctx, cx, cy, cs, dir, theme) {
+  const eyeSize = cs * 0.11;
+  const eyeOffset = cs * 0.22;
+  let ex1, ey1, ex2, ey2;
+
+  switch (dir) {
+    case 'RIGHT':
+      ex1 = cx + eyeOffset; ey1 = cy - cs * 0.12;
+      ex2 = cx + eyeOffset; ey2 = cy + cs * 0.12;
+      break;
+    case 'LEFT':
+      ex1 = cx - eyeOffset; ey1 = cy - cs * 0.12;
+      ex2 = cx - eyeOffset; ey2 = cy + cs * 0.12;
+      break;
+    case 'UP':
+      ex1 = cx - cs * 0.12; ey1 = cy - eyeOffset;
+      ex2 = cx + cs * 0.12; ey2 = cy - eyeOffset;
+      break;
+    case 'DOWN':
+      ex1 = cx - cs * 0.12; ey1 = cy + eyeOffset;
+      ex2 = cx + cs * 0.12; ey2 = cy + eyeOffset;
+      break;
+  }
+
+  ctx.fillStyle = '#fff';
+  ctx.beginPath();
+  ctx.arc(ex1, ey1, eyeSize, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(ex2, ey2, eyeSize, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = '#000';
+  const pupilOffset = cs * 0.03;
+  let px = 0, py = 0;
+  switch (dir) {
+    case 'RIGHT': px = pupilOffset; break;
+    case 'LEFT': px = -pupilOffset; break;
+    case 'UP': py = -pupilOffset; break;
+    case 'DOWN': py = pupilOffset; break;
+  }
+
+  ctx.beginPath();
+  ctx.arc(ex1 + px, ey1 + py, eyeSize * 0.5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(ex2 + px, ey2 + py, eyeSize * 0.5, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+  ctx.beginPath();
+  ctx.arc(ex1 - eyeSize * 0.2, ey1 - eyeSize * 0.2, eyeSize * 0.25, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(ex2 - eyeSize * 0.2, ey2 - eyeSize * 0.2, eyeSize * 0.25, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawTongue(ctx, cx, cy, cs, dir, theme) {
+  const tongueLen = cs * 0.45;
+  const tongueWidth = cs * 0.06;
+  let tx = cx, ty = cy;
+  let angle = 0;
+
+  switch (dir) {
+    case 'RIGHT': tx += cs * 0.5; angle = 0; break;
+    case 'LEFT': tx -= cs * 0.5; angle = Math.PI; break;
+    case 'UP': ty -= cs * 0.5; angle = -Math.PI / 2; break;
+    case 'DOWN': ty += cs * 0.5; angle = Math.PI / 2; break;
+  }
+
+  const flicker = Math.sin(Date.now() * 0.015) > 0.3;
+  if (!flicker) return;
+
+  ctx.save();
+  ctx.translate(tx, ty);
+  ctx.rotate(angle);
+
+  ctx.fillStyle = '#ff6b6b';
+  ctx.beginPath();
+  ctx.roundRect(0, -tongueWidth / 2, tongueLen * 0.7, tongueWidth, tongueWidth / 2);
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(tongueLen * 0.7, -tongueWidth * 0.8);
+  ctx.lineTo(tongueLen, -tongueWidth * 0.3);
+  ctx.lineTo(tongueLen * 0.7, 0);
+  ctx.lineTo(tongueLen, tongueWidth * 0.3);
+  ctx.lineTo(tongueLen * 0.7, tongueWidth * 0.8);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.restore();
 }
 
 function drawAmbient(ctx, theme) {
@@ -529,5 +644,14 @@ function lightenColor(hex, percent) {
   const R = Math.min(255, (num >> 16) + amt);
   const G = Math.min(255, ((num >> 8) & 0x00FF) + amt);
   const B = Math.min(255, (num & 0x0000FF) + amt);
+  return `#${(0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1)}`;
+}
+
+function darkenColor(hex, percent) {
+  const num = parseInt(hex.replace('#', ''), 16);
+  const amt = Math.round(2.55 * percent);
+  const R = Math.max(0, (num >> 16) - amt);
+  const G = Math.max(0, ((num >> 8) & 0x00FF) - amt);
+  const B = Math.max(0, (num & 0x0000FF) - amt);
   return `#${(0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1)}`;
 }

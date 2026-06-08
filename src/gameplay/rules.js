@@ -55,13 +55,11 @@ export function checkFood() {
     playSound('EAT');
     spawnParticles(head.x * state.cellSize + state.cellSize / 2, head.y * state.cellSize + state.cellSize / 2, 'food');
 
-    // DEFAULT MODE: After 5 points, obstacles appear!
     if (state.score === 5 && state.settings.difficulty === 'normal') {
       spawnObstacles(3);
       showToast('⚠ OBSTACLES APPEAR!');
       playSound('LEVEL_UP');
     }
-    // More obstacles every 10 points after
     if (state.score > 5 && state.score % 10 === 0 && state.settings.difficulty === 'normal') {
       spawnObstacles(2);
       showToast('⚠ MORE OBSTACLES!');
@@ -103,9 +101,9 @@ function spawnObstacles(count) {
         y: Math.floor(Math.random() * state.gridSize),
       };
       attempts++;
-    } while ((isOnSnake(pos) || isOnObstacle(pos) || 
-              (state.food && pos.x === state.food.x && pos.y === state.food.y) ||
-              (state.specialFood && pos.x === state.specialFood.x && pos.y === state.specialFood.y)) && attempts < 100);
+    } while ((isOnSnake(pos) || isOnObstacle(pos) ||
+      (state.food && pos.x === state.food.x && pos.y === state.food.y) ||
+      (state.specialFood && pos.x === state.specialFood.x && pos.y === state.specialFood.y)) && attempts < 100);
 
     if (attempts < 100) {
       state.obstacles.push(pos);
@@ -132,6 +130,7 @@ function handleCombo() {
   state.lastEatTime = now;
 }
 
+// FIX: Slower speed progression - 1.5ms per level, min 65ms, cap at level 20
 function checkLevelUp() {
   if (state.foodsEatenThisLevel >= 5) {
     state.foodsEatenThisLevel = 0;
@@ -139,8 +138,9 @@ function checkLevelUp() {
     playSound('LEVEL_UP');
     showToast(`🚀 LEVEL ${state.level}!`);
     addShake(3);
-    const baseStep = { easy: 150, normal: 120, hard: 90, insane: 70 }[state.settings.difficulty];
-    state.step = Math.max(baseStep - (state.level - 1) * 3, 50);
+    const baseStep = { easy: 180, normal: 140, hard: 110, insane: 85 }[state.settings.difficulty];
+    const levelReduction = Math.min(state.level - 1, 20) * 1.5;
+    state.step = Math.max(baseStep - levelReduction, 65);
   }
 }
 
@@ -148,13 +148,11 @@ export function checkCollision() {
   const head = state.snake[0];
   const gs = state.gridSize;
 
-  // Wall collision
   if (head.x < 0 || head.y < 0 || head.x >= gs || head.y >= gs) {
     triggerGameOver();
     return;
   }
 
-  // Self collision
   for (let i = 1; i < state.snake.length; i++) {
     if (head.x === state.snake[i].x && head.y === state.snake[i].y) {
       triggerGameOver();
@@ -162,7 +160,6 @@ export function checkCollision() {
     }
   }
 
-  // Obstacle collision
   for (const obs of state.obstacles) {
     if (head.x === obs.x && head.y === obs.y) {
       triggerGameOver();

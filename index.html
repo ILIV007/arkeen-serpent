@@ -15,7 +15,7 @@
   <!-- UI Layer -->
   <div id="uiLayer">
 
-    <!-- ===== MAIN MENU ===== -->
+    <!-- ====== MAIN MENU ====== -->
     <div id="menuScreen" class="screen active">
       <div class="menu-layout">
         <!-- Left: Logo + Nav (centered) -->
@@ -38,7 +38,7 @@
               <span class="btn-badge" id="diffBadge">NORMAL</span>
             </button>
             <button class="menu-btn" data-action="themes">
-              <span class="btn-icon">🌙</span>
+              <span class="btn-icon">🎨</span>
               <span class="btn-text">REALMS</span>
               <span class="btn-badge" id="themeBadge">VOID</span>
             </button>
@@ -74,10 +74,10 @@
       </div>
     </div>
 
-    <!-- ===== DIFFICULTY ===== -->
+    <!-- ====== DIFFICULTY ====== -->
     <div id="difficultyScreen" class="screen">
       <div class="screen-header">
-        <button class="back-btn" data-back="menu">◀</button>
+        <button class="back-btn" data-back="menu">↩</button>
         <h2>⚔ CHOOSE DIFFICULTY ⚔</h2>
       </div>
       <div class="selector-grid">
@@ -104,15 +104,15 @@
       </div>
     </div>
 
-    <!-- ===== THEMES ===== -->
+    <!-- ====== THEMES ====== -->
     <div id="themesScreen" class="screen">
       <div class="screen-header">
-        <button class="back-btn" data-back="menu">◀</button>
-        <h2>🌙 CHOOSE REALM 🌙</h2>
+        <button class="back-btn" data-back="menu">↩</button>
+        <h2>🎨 CHOOSE REALM 🎨</h2>
       </div>
       <div class="selector-grid themes">
         <button class="select-card selected" data-theme="void">
-          <span class="card-icon">🌑</span>
+          <span class="card-icon">🌌</span>
           <span class="card-title">VOID</span>
           <span class="card-desc">Infinite darkness</span>
         </button>
@@ -139,19 +139,19 @@
       </div>
     </div>
 
-    <!-- ===== ACHIEVEMENTS ===== -->
+    <!-- ====== ACHIEVEMENTS ====== -->
     <div id="achievementsScreen" class="screen">
       <div class="screen-header">
-        <button class="back-btn" data-back="menu">◀</button>
+        <button class="back-btn" data-back="menu">↩</button>
         <h2>🏆 TOME OF GLORY 🏆</h2>
       </div>
       <div class="achievements-grid" id="achievementsGrid"></div>
     </div>
 
-    <!-- ===== SETTINGS ===== -->
+    <!-- ====== SETTINGS ====== -->
     <div id="settingsScreen" class="screen">
       <div class="screen-header">
-        <button class="back-btn" data-back="menu">◀</button>
+        <button class="back-btn" data-back="menu">↩</button>
         <h2>⚙ SETTINGS ⚙</h2>
       </div>
       <div class="settings-list">
@@ -181,16 +181,16 @@
           <span class="toggle"></span>
         </label>
         <button class="menu-btn danger" id="resetDataBtn">
-          <span class="btn-icon">⚠</span>
+          <span class="btn-icon">☠</span>
           <span class="btn-text">RESET ALL DATA</span>
         </button>
       </div>
     </div>
 
-    <!-- ===== HOW TO PLAY ===== -->
+    <!-- ====== HOW TO PLAY ====== -->
     <div id="howtoScreen" class="screen">
       <div class="screen-header">
-        <button class="back-btn" data-back="menu">◀</button>
+        <button class="back-btn" data-back="menu">↩</button>
         <h2>❓ HOW TO PLAY ❓</h2>
       </div>
       <div class="howto-content">
@@ -206,18 +206,18 @@
           <p>Combo resets after 2.5s.</p>
         </div>
         <div class="howto-section">
-          <h3>🌟 Level Up</h3>
+          <h3>⭐ Level Up</h3>
           <p>Every 5 foods = Level Up</p>
           <p>Speed increases each level.</p>
         </div>
         <div class="howto-section">
           <h3>⚔ Difficulty</h3>
-          <p>Easy: 150ms · Normal: 120ms · Hard: 90ms · Insane: 70ms</p>
+          <p>Easy: 180ms · Normal: 140ms · Hard: 110ms · Insane: 85ms</p>
         </div>
       </div>
     </div>
 
-    <!-- ===== HUD ===== -->
+    <!-- ====== HUD ====== -->
     <div id="hud" class="hud hidden">
       <div class="hud-top">
         <div class="hud-left">
@@ -246,7 +246,7 @@
       </div>
     </div>
 
-    <!-- ===== PAUSE ===== -->
+    <!-- ====== PAUSE ====== -->
     <div id="pauseScreen" class="overlay-screen">
       <div class="overlay-content">
         <h2>⏸ PAUSED ⏸</h2>
@@ -262,7 +262,7 @@
       </div>
     </div>
 
-    <!-- ===== GAME OVER ===== -->
+    <!-- ====== GAME OVER ====== -->
     <div id="gameoverScreen" class="overlay-screen">
       <div class="overlay-content">
         <h2 class="gameover-title">💀 THE SERPENT FALLS 💀</h2>
@@ -300,7 +300,7 @@
       </div>
     </div>
 
-    <!-- ===== MOBILE D-PAD ===== -->
+    <!-- ====== MOBILE D-PAD ====== -->
     <div id="mobileControls" class="mobile-controls hidden">
       <div class="d-pad">
         <button class="d-btn d-up" data-dir="UP">▲</button>
@@ -311,7 +311,7 @@
       </div>
     </div>
 
-    <!-- ===== TOASTS ===== -->
+    <!-- ====== TOASTS ====== -->
     <div id="toastContainer"></div>
 
   </div>

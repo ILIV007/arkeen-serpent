@@ -192,7 +192,7 @@ function renderMenuLeaderboard() {
   }
   list.innerHTML = state.leaderboard.slice(0, 5).map((entry, i) => {
     const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
-    return `<div class="lb-entry"><span class="lb-rank">${medal}</span><span class="lb-name">${entry.name || 'Unknown'}</span><span class="lb-score">${entry.score}</span></div>`;
+    return `<div class="lb-entry"><span class="lb-rank ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''}">${medal}</span><span class="lb-name">${entry.name || 'Unknown'}</span><span class="lb-score">${entry.score}</span></div>`;
   }).join('');
 }
 
@@ -222,7 +222,8 @@ function restartGame() {
   state.startTime = Date.now();
   state.step = DIFFICULTY[state.settings.difficulty].step;
   state.moveAccumulator = 0;
-  state.obstacles = []; // RESET obstacles!
+  state.accumulator = 0;
+  state.obstacles = [];
 
   const mid = Math.floor(state.gridSize / 2);
   state.snake = [

@@ -41,7 +41,7 @@ export const state = {
   lastTime: 0,
   accumulator: 0,
   moveAccumulator: 0,
-  step: 120,
+  step: 140,
   paused: false,
   gameOver: false,
   startTime: 0,
@@ -49,15 +49,12 @@ export const state = {
 };
 
 export const DIFFICULTY = {
-  easy: { step: 150, label: 'EASY' },
-  normal: { step: 120, label: 'NORMAL' },
-  hard: { step: 90, label: 'HARD' },
-  insane: { step: 70, label: 'INSANE' },
+  easy: { step: 180, label: 'EASY' },
+  normal: { step: 140, label: 'NORMAL' },
+  hard: { step: 110, label: 'HARD' },
+  insane: { step: 85, label: 'INSANE' },
 };
 
-// =====================================================
-// COMPLETE THEME ENGINE - Each theme has full identity
-// =====================================================
 export const THEMES = {
   void: {
     name: 'VOID',
@@ -84,7 +81,6 @@ export const THEMES = {
   },
   moon: {
     name: 'MOON',
-    // FIXED: Silver-blue-gray, NOT pure white!
     bg: '#1a2332',
     bgGradient: ['#1a2332', '#0f172a'],
     boardBg: 'rgba(30, 41, 59, 0.7)',

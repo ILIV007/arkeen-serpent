@@ -30,6 +30,9 @@ function update() {
       checkCollision();
     }
   }
+  if (state.mode === 'gameover' && state.moveAccumulator > 0) {
+    state.moveAccumulator = 0;
+  }
   if (state.mode !== lastScreenMode) {
     lastScreenMode = state.mode;
     updateScreenVisibility();
