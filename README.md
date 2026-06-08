@@ -1,45 +1,32 @@
-# 🌌 Arkeen Serpent v1.1
+# 🌌 Arkeen Serpent v1.3
 
-A modern Space Arcade Snake game built with pure HTML5/CSS3/ES6+.
+A modern Space Arcade Snake game. Clean architecture, event-driven, zero dependencies.
+
+## Architecture
+```
+src/
+  core/        — state, config, loop (single RAF)
+  systems/     — input, audio, storage
+  gameplay/    — snake movement, rules engine
+  render/      — renderer, particles (visual only)
+  ui/          — screens, menu, HUD
+  utils/       — events, math
+```
 
 ## Features
-- 🎮 Adventure Mode with progressive difficulty
-- ⚔ 5 Difficulty Levels (Easy to Nightmare)
-- 🌌 6 Space-Themed Realms (Nebula, Dungeon, Forest, Volcano, Icy, Mystic)
-- 🏆 Local Leaderboard (Top 5, Arcade Style)
-- 📜 Statistics & Achievements
-- 🔥 Combo System & XP Levels
-- ✨ Particle Effects & Screen Shake
+- 🎮 Adventure Mode + 5 Difficulty Levels
+- 🌌 6 Space-Themed Realms (Nebula Void default)
 - 🕳 Black Hole Pits (warning → open → close)
-- ☄ Meteors falling across screen
+- ☄ Meteors across screen
+- 🔥 Combo System + XP/Level
+- 🏆 Local Leaderboard (Top 5, Arcade Style)
+- 📜 Statistics
 - 🎵 Procedural WebAudio SFX
-- 📱 Swipe Controls + Keyboard
-- 📦 PWA Ready (Install on Mobile)
+- 📱 Swipe + Keyboard
+- 📦 PWA Ready
 
-## File Structure
-```
-arkeen-serpent/
-├── index.html
-├── css/
-│   └── style.css
-├── js/
-│   ├── config.js      ← Game balance & themes
-│   ├── main.js
-│   ├── game.js
-│   ├── renderer.js
-│   ├── audio.js
-│   ├── input.js
-│   ├── menu.js
-│   └── storage.js
-├── manifest.json
-├── sw.js
-└── README.md
-```
-
-## Deploy to Cloudflare Pages
-1. Upload all files to Cloudflare Pages (Direct Upload)
-2. Get free `.pages.dev` domain with global CDN
-3. PWA installable on mobile
+## Deploy
+Upload to **Cloudflare Pages** → Direct Upload → Deploy.
 
 ## Telegram
 [t.me/ILIVIR3](https://t.me/ILIVIR3)
