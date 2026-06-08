@@ -172,7 +172,6 @@ function renderGameOver() {
   document.getElementById('goLevel').textContent = state.level;
   document.getElementById('goBest').textContent = state.best;
   const nameEntry = document.getElementById('nameEntry');
-  // Check if current score is in top 5
   const top5Scores = state.leaderboard.slice(0, 5).map(e => e.score);
   const minTop5 = top5Scores.length < 5 ? 0 : Math.min(...top5Scores);
   const isTop5 = state.score > 0 && (state.leaderboard.length < 5 || state.score >= minTop5);
@@ -223,6 +222,7 @@ function restartGame() {
   state.startTime = Date.now();
   state.step = DIFFICULTY[state.settings.difficulty].step;
   state.moveAccumulator = 0;
+  state.obstacles = []; // RESET obstacles!
 
   const mid = Math.floor(state.gridSize / 2);
   state.snake = [

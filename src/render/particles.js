@@ -77,7 +77,6 @@ export function drawParticles(ctx) {
     ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);
     ctx.fill();
 
-    // Sparkle effect for special food
     if (p.type === 'special' && Math.random() > 0.7) {
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
@@ -86,7 +85,6 @@ export function drawParticles(ctx) {
     }
   }
 
-  // Draw floating texts
   for (const t of floatingTexts) {
     const alpha = t.life / t.maxLife;
     ctx.globalAlpha = alpha;

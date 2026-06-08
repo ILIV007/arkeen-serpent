@@ -1,5 +1,5 @@
 import { state, THEMES } from '../core/state.js';
-import { drawParticles, updateParticles, spawnFloatingText } from './particles.js';
+import { drawParticles, updateParticles } from './particles.js';
 import { updateJuice, applyShake, applyFlash } from './juice.js';
 
 let canvas, ctx;
@@ -58,15 +58,20 @@ function generateFireflies() {
   }
 }
 
+// Helper: build rgba string from array [r, g, b, a]
+function rgba(arr, alpha) {
+  if (alpha !== undefined) {
+    return `rgba(${arr[0]}, ${arr[1]}, ${arr[2]}, ${alpha})`;
+  }
+  return `rgba(${arr[0]}, ${arr[1]}, ${arr[2]}, ${arr[3]})`;
+}
+
 export function render() {
   const theme = THEMES[state.settings.theme];
   ctx.save();
   applyShake(ctx);
 
-  // Background
   drawBackground(ctx, theme);
-
-  // Ambient effects
   drawAmbient(ctx, theme);
 
   if (state.mode === 'playing' || state.mode === 'paused' || state.mode === 'gameover') {
@@ -80,7 +85,6 @@ export function render() {
 }
 
 function drawBackground(ctx, theme) {
-  // Gradient background
   const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
   grad.addColorStop(0, theme.bgGradient[0]);
   grad.addColorStop(1, theme.bgGradient[1]);
@@ -91,7 +95,6 @@ function drawBackground(ctx, theme) {
 function drawMenuBackground(ctx, theme) {
   drawAmbient(ctx, theme);
 
-  // Animated serpent trail in menu
   const t = Date.now() * 0.001;
   ctx.strokeStyle = theme.snakeTrail;
   ctx.globalAlpha = 0.12;
@@ -113,33 +116,28 @@ function drawGame(ctx, theme) {
   const offsetX = (canvas.width - gs * cs) / 2;
   const offsetY = (canvas.height - gs * cs) / 2;
 
-  // ===== BOARD BACKGROUND =====
-  // Board shadow
-  ctx.shadowColor = theme.snakeHeadGlow;
+  // ===== BOARD =====
+  ctx.shadowColor = rgba(theme.snakeHeadGlow, 0.3);
   ctx.shadowBlur = 20;
   ctx.fillStyle = theme.boardBg;
   roundRect(ctx, offsetX - 4, offsetY - 4, gs * cs + 8, gs * cs + 8, 8);
   ctx.fill();
   ctx.shadowBlur = 0;
 
-  // Board border
   ctx.strokeStyle = theme.boardBorder;
   ctx.lineWidth = 2;
   roundRect(ctx, offsetX - 4, offsetY - 4, gs * cs + 8, gs * cs + 8, 8);
   ctx.stroke();
 
-  // Inner board fill
   ctx.fillStyle = theme.boardBg;
   ctx.fillRect(offsetX, offsetY, gs * cs, gs * cs);
 
   // ===== GRID =====
   if (state.settings.grid) {
-    // Strong outer border
     ctx.strokeStyle = theme.gridStrong;
     ctx.lineWidth = 1.5;
     ctx.strokeRect(offsetX, offsetY, gs * cs, gs * cs);
 
-    // Inner grid lines
     ctx.strokeStyle = theme.grid;
     ctx.lineWidth = 0.5;
     ctx.globalAlpha = 0.6;
@@ -154,6 +152,25 @@ function drawGame(ctx, theme) {
       ctx.stroke();
     }
     ctx.globalAlpha = 1;
+  }
+
+  // ===== OBSTACLES =====
+  for (const obs of state.obstacles) {
+    const ox = offsetX + obs.x * cs;
+    const oy = offsetY + obs.y * cs;
+    ctx.fillStyle = '#555';
+    ctx.fillRect(ox + 2, oy + 2, cs - 4, cs - 4);
+    ctx.fillStyle = '#777';
+    ctx.fillRect(ox + 4, oy + 4, cs - 8, cs - 8);
+    // X mark
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(ox + 4, oy + 4);
+    ctx.lineTo(ox + cs - 4, oy + cs - 4);
+    ctx.moveTo(ox + cs - 4, oy + 4);
+    ctx.lineTo(ox + 4, oy + cs - 4);
+    ctx.stroke();
   }
 
   // ===== SNAKE TRAIL =====
@@ -178,18 +195,16 @@ function drawGame(ctx, theme) {
     const fy = offsetY + state.food.y * cs + cs / 2;
     const pulse = 1 + Math.sin(Date.now() * 0.005) * 0.2;
 
-    // Outer glow
     const glowGrad = ctx.createRadialGradient(fx, fy, 0, fx, fy, cs * pulse * 1.8);
-    glowGrad.addColorStop(0, theme.foodGlow.replace(')', ', 0.3)').replace('rgb', 'rgba'));
+    glowGrad.addColorStop(0, rgba(theme.foodGlow, 0.3));
     glowGrad.addColorStop(1, 'transparent');
     ctx.fillStyle = glowGrad;
     ctx.beginPath();
     ctx.arc(fx, fy, cs * pulse * 1.8, 0, Math.PI * 2);
     ctx.fill();
 
-    // Inner glow
     const innerGlow = ctx.createRadialGradient(fx, fy, 0, fx, fy, cs * pulse * 0.8);
-    innerGlow.addColorStop(0, theme.foodGlow.replace(')', ', 0.6)').replace('rgb', 'rgba'));
+    innerGlow.addColorStop(0, rgba(theme.foodGlow, 0.6));
     innerGlow.addColorStop(1, 'transparent');
     ctx.fillStyle = innerGlow;
     ctx.beginPath();
@@ -203,16 +218,14 @@ function drawGame(ctx, theme) {
     const sy = offsetY + state.specialFood.y * cs + cs / 2;
     const pulse = 1 + Math.sin(Date.now() * 0.008) * 0.3;
 
-    // Outer glow
     const glowGrad = ctx.createRadialGradient(sx, sy, 0, sx, sy, cs * pulse * 2);
-    glowGrad.addColorStop(0, theme.specialFoodGlow.replace(')', ', 0.4)').replace('rgb', 'rgba'));
+    glowGrad.addColorStop(0, rgba(theme.specialFoodGlow, 0.4));
     glowGrad.addColorStop(1, 'transparent');
     ctx.fillStyle = glowGrad;
     ctx.beginPath();
     ctx.arc(sx, sy, cs * pulse * 2, 0, Math.PI * 2);
     ctx.fill();
 
-    // Star shape
     ctx.fillStyle = theme.specialFood;
     ctx.save();
     ctx.translate(sx, sy);
@@ -230,10 +243,9 @@ function drawGame(ctx, theme) {
     const size = isHead ? cs * 0.88 : cs * 0.72;
     const pad = (cs - size) / 2;
 
-    // Head glow
     if (isHead) {
       const grad = ctx.createRadialGradient(sx + cs / 2, sy + cs / 2, 0, sx + cs / 2, sy + cs / 2, cs * 1.3);
-      grad.addColorStop(0, theme.snakeHeadGlow.replace(')', ', 0.3)').replace('rgb', 'rgba'));
+      grad.addColorStop(0, rgba(theme.snakeHeadGlow, 0.3));
       grad.addColorStop(1, 'transparent');
       ctx.fillStyle = grad;
       ctx.beginPath();
@@ -241,11 +253,9 @@ function drawGame(ctx, theme) {
       ctx.fill();
     }
 
-    // Body segment
     const alpha = isHead ? 1 : 0.5 + (state.snake.length - i) / state.snake.length * 0.5;
     ctx.globalAlpha = alpha;
 
-    // Gradient for each segment
     const segGrad = ctx.createRadialGradient(
       sx + cs / 2, sy + cs / 2, 0,
       sx + cs / 2, sy + cs / 2, size / 2
@@ -254,7 +264,6 @@ function drawGame(ctx, theme) {
       segGrad.addColorStop(0, lightenColor(theme.snakeHead, 20));
       segGrad.addColorStop(1, theme.snakeHead);
     } else {
-      const fadeRatio = i / state.snake.length;
       segGrad.addColorStop(0, theme.snakeBody);
       segGrad.addColorStop(1, theme.snakeBodyFade);
     }
@@ -264,7 +273,6 @@ function drawGame(ctx, theme) {
     ctx.fill();
     ctx.globalAlpha = 1;
 
-    // Head eyes
     if (isHead) {
       ctx.fillStyle = '#000';
       const eyeSize = cs * 0.1;
@@ -294,7 +302,6 @@ function drawGame(ctx, theme) {
       ctx.arc(ex2, ey2, eyeSize, 0, Math.PI * 2);
       ctx.fill();
 
-      // Eye shine
       ctx.fillStyle = '#fff';
       ctx.beginPath();
       ctx.arc(ex1 - eyeSize * 0.2, ey1 - eyeSize * 0.2, eyeSize * 0.4, 0, Math.PI * 2);
@@ -316,7 +323,6 @@ function drawGame(ctx, theme) {
     ctx.arc(fx, fy, cs * 0.28 * pulse, 0, Math.PI * 2);
     ctx.fill();
 
-    // Food highlight
     ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
     ctx.beginPath();
     ctx.arc(fx - cs * 0.08, fy - cs * 0.08, cs * 0.1, 0, Math.PI * 2);
@@ -338,8 +344,6 @@ function drawAmbient(ctx, theme) {
   } else if (theme.ambient === 'gold_dust') {
     drawGoldDust(ctx, theme);
   }
-
-  // Meteors (rare, all themes)
   drawMeteors(ctx, theme);
 }
 
@@ -348,14 +352,13 @@ function drawStars(ctx, theme) {
   for (const s of stars) {
     const flicker = 0.5 + Math.sin(t * s.twinkleSpeed + s.phase) * 0.5;
     const alpha = s.brightness * flicker;
-    ctx.fillStyle = theme.starColor + ` ${alpha})`;
+    ctx.fillStyle = rgba(theme.starColor, alpha);
     ctx.beginPath();
     ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
     ctx.fill();
 
-    // Cross sparkle for bright stars
     if (alpha > 0.7 && s.size > 1.5) {
-      ctx.strokeStyle = theme.starColor + ` ${alpha * 0.5})`;
+      ctx.strokeStyle = rgba(theme.starColor, alpha * 0.5);
       ctx.lineWidth = 0.5;
       ctx.beginPath();
       ctx.moveTo(s.x - s.size * 2, s.y);
@@ -381,7 +384,6 @@ function drawEmbers(ctx, theme) {
     ctx.fill();
   }
 
-  // Floating ember particles
   for (let i = 0; i < 20; i++) {
     const x = (Math.sin(t * 0.2 + i * 0.8) * 0.5 + 0.5) * canvas.width;
     const y = canvas.height - (t * 30 + i * 50) % canvas.height;
@@ -399,7 +401,6 @@ function drawFirefliesEffect(ctx, theme) {
     f.x += f.vx + Math.sin(t + f.phase) * 0.3;
     f.y += f.vy + Math.cos(t + f.phase) * 0.3;
 
-    // Wrap around
     if (f.x < 0) f.x = canvas.width;
     if (f.x > canvas.width) f.x = 0;
     if (f.y < 0) f.y = canvas.height;
@@ -411,7 +412,6 @@ function drawFirefliesEffect(ctx, theme) {
     ctx.arc(f.x, f.y, f.size, 0, Math.PI * 2);
     ctx.fill();
 
-    // Glow
     const glow = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.size * 4);
     glow.addColorStop(0, `rgba(52, 211, 153, ${flicker * 0.3})`);
     glow.addColorStop(1, 'transparent');
@@ -439,7 +439,6 @@ function drawGoldDust(ctx, theme) {
 function drawMeteors(ctx, theme) {
   const now = Date.now();
 
-  // Spawn new meteor every 10-15 seconds
   if (now - lastMeteorTime > 10000 + Math.random() * 5000) {
     lastMeteorTime = now;
     meteors.push({
@@ -468,7 +467,6 @@ function drawMeteors(ctx, theme) {
     const tailX = m.x - m.vx * (m.length / 5);
     const tailY = m.y - m.vy * (m.length / 5);
 
-    // Meteor trail
     const grad = ctx.createLinearGradient(m.x, m.y, tailX, tailY);
     grad.addColorStop(0, `rgba(255, 255, 255, ${alpha})`);
     grad.addColorStop(0.5, `rgba(255, 215, 0, ${alpha * 0.6})`);
@@ -481,7 +479,6 @@ function drawMeteors(ctx, theme) {
     ctx.lineTo(tailX, tailY);
     ctx.stroke();
 
-    // Head
     ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
     ctx.beginPath();
     ctx.arc(m.x, m.y, 2, 0, Math.PI * 2);

@@ -14,7 +14,7 @@ export function spawnFood() {
       y: Math.floor(Math.random() * state.gridSize),
     };
     attempts++;
-  } while (isOnSnake(pos) && attempts < 100);
+  } while ((isOnSnake(pos) || isOnObstacle(pos)) && attempts < 100);
   state.food = pos;
 }
 
@@ -28,13 +28,17 @@ export function spawnSpecialFood() {
       y: Math.floor(Math.random() * state.gridSize),
     };
     attempts++;
-  } while ((isOnSnake(pos) || (state.food && pos.x === state.food.x && pos.y === state.food.y)) && attempts < 100);
+  } while ((isOnSnake(pos) || isOnObstacle(pos) || (state.food && pos.x === state.food.x && pos.y === state.food.y)) && attempts < 100);
   state.specialFood = pos;
   state.specialFoodTimer = 6000;
 }
 
 function isOnSnake(pos) {
   return state.snake.some(s => s.x === pos.x && s.y === pos.y);
+}
+
+function isOnObstacle(pos) {
+  return state.obstacles.some(o => o.x === pos.x && o.y === pos.y);
 }
 
 export function checkFood() {
@@ -50,6 +54,18 @@ export function checkFood() {
     growSnake(1);
     playSound('EAT');
     spawnParticles(head.x * state.cellSize + state.cellSize / 2, head.y * state.cellSize + state.cellSize / 2, 'food');
+
+    // DEFAULT MODE: After 5 points, obstacles appear!
+    if (state.score === 5 && state.settings.difficulty === 'normal') {
+      spawnObstacles(3);
+      showToast('⚠ OBSTACLES APPEAR!');
+      playSound('LEVEL_UP');
+    }
+    // More obstacles every 10 points after
+    if (state.score > 5 && state.score % 10 === 0 && state.settings.difficulty === 'normal') {
+      spawnObstacles(2);
+      showToast('⚠ MORE OBSTACLES!');
+    }
   }
 
   if (state.specialFood && head.x === state.specialFood.x && head.y === state.specialFood.y) {
@@ -74,6 +90,26 @@ export function checkFood() {
   if (state.specialFood) {
     state.specialFoodTimer -= state.step;
     if (state.specialFoodTimer <= 0) state.specialFood = null;
+  }
+}
+
+function spawnObstacles(count) {
+  for (let i = 0; i < count; i++) {
+    let pos;
+    let attempts = 0;
+    do {
+      pos = {
+        x: Math.floor(Math.random() * state.gridSize),
+        y: Math.floor(Math.random() * state.gridSize),
+      };
+      attempts++;
+    } while ((isOnSnake(pos) || isOnObstacle(pos) || 
+              (state.food && pos.x === state.food.x && pos.y === state.food.y) ||
+              (state.specialFood && pos.x === state.specialFood.x && pos.y === state.specialFood.y)) && attempts < 100);
+
+    if (attempts < 100) {
+      state.obstacles.push(pos);
+    }
   }
 }
 
@@ -111,12 +147,24 @@ function checkLevelUp() {
 export function checkCollision() {
   const head = state.snake[0];
   const gs = state.gridSize;
+
+  // Wall collision
   if (head.x < 0 || head.y < 0 || head.x >= gs || head.y >= gs) {
     triggerGameOver();
     return;
   }
+
+  // Self collision
   for (let i = 1; i < state.snake.length; i++) {
     if (head.x === state.snake[i].x && head.y === state.snake[i].y) {
+      triggerGameOver();
+      return;
+    }
+  }
+
+  // Obstacle collision
+  for (const obs of state.obstacles) {
+    if (head.x === obs.x && head.y === obs.y) {
       triggerGameOver();
       return;
     }
